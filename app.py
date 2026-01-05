@@ -8,13 +8,11 @@ import matplotlib.pyplot as plt
 # -------------------------------------------------
 st.set_page_config(page_title="Multivariable Calculus App", layout="wide")
 st.title("📐 Multivariable Calculus Learning App")
-st.write("Interactive visualization and explanation of functions of several variables.")
 
-# Symbols
-x, y = sp.symbols('x y')
+x, y = sp.symbols("x y")
 
 # -------------------------------------------------
-# Safe function parser
+# Safe parser
 # -------------------------------------------------
 def parse_function(expr_input):
     try:
@@ -28,211 +26,157 @@ def parse_function(expr_input):
                 "cos": sp.cos,
                 "tan": sp.tan,
                 "exp": sp.exp,
-                "e": sp.E,
+                "sqrt": sp.sqrt,
                 "ln": sp.log,
                 "log": sp.log,
-                "sqrt": sp.sqrt
-            }
+                "e": sp.E,
+            },
         )
         return f, None
     except Exception:
         return None, "Invalid function"
 
-# Sidebar
 topic = st.sidebar.selectbox(
     "Select Topic",
     [
         "Function of Two Variables",
         "Partial Derivatives",
-        "Directional Derivatives",
-        "Gradient & Steepest Ascent",
-        "Differentials"
-    ]
+        "Differentials",
+    ],
 )
 
-# -------------------------------------------------
+# =================================================
 # 1. Function of Two Variables
-# -------------------------------------------------
+# =================================================
 if topic == "Function of Two Variables":
-    st.header("Meaning & Visualization of f(x, y)")
+    st.header("Meaning of a Function of Two Variables")
 
     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
-    st.caption("Examples: x^2 + y^2, sin(x)+y, exp(x+y), sqrt(x^2+y^2)")
-
     f, error = parse_function(expr_input)
     if error:
-        st.error("❌ Invalid function. Please check your input.")
+        st.error("Invalid function.")
         st.stop()
 
     st.latex(f"f(x,y) = {sp.latex(f)}")
 
-    x_vals = np.linspace(-5, 5, 100)
-    y_vals = np.linspace(-5, 5, 100)
-    X, Y = np.meshgrid(x_vals, y_vals)
+    col1, col2 = st.columns(2)
+
+    with col1:
+        x0 = st.slider("x₀", -4.0, 4.0, 1.0)
+        y0 = st.slider("y₀", -4.0, 4.0, 1.0)
 
     f_np = sp.lambdify((x, y), f, "numpy")
 
-    try:
-        Z = f_np(X, Y)
-    except Exception:
-        st.error("❌ Function cannot be evaluated on this range.")
-        st.stop()
+    x_vals = np.linspace(-5, 5, 100)
+    y_vals = np.linspace(-5, 5, 100)
+    X, Y = np.meshgrid(x_vals, y_vals)
+    Z = f_np(X, Y)
 
+    # 3D surface
     fig = plt.figure(figsize=(6, 5))
     ax = fig.add_subplot(projection="3d")
-    ax.plot_surface(X, Y, Z)
+    ax.plot_surface(X, Y, Z, alpha=0.8)
+    ax.scatter(x0, y0, f_np(x0, y0), color="red", s=50)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("f(x,y)")
     st.pyplot(fig)
 
+    # Contour plot
+    fig2, ax2 = plt.subplots()
+    contour = ax2.contour(X, Y, Z, levels=15)
+    ax2.clabel(contour)
+    ax2.scatter(x0, y0, color="red")
+    ax2.set_xlabel("x")
+    ax2.set_ylabel("y")
+    st.pyplot(fig2)
+
+    st.success(f"f({x0:.2f}, {y0:.2f}) = {f_np(x0, y0):.3f}")
+
     st.info(
         "A function of two variables assigns a value to each point (x, y). "
-        "The surface shows how f(x, y) changes as x and y vary."
+        "The surface shows height, while contour lines show points with equal values."
     )
 
-# -------------------------------------------------
+# =================================================
 # 2. Partial Derivatives
-# -------------------------------------------------
+# =================================================
 elif topic == "Partial Derivatives":
     st.header("Partial Derivatives as Rates of Change")
 
     expr_input = st.text_input("Enter f(x, y):", "x^2 + x*y")
-    st.caption("Examples: x^2 + xy, sin(xy), exp(x+y)")
-
     f, error = parse_function(expr_input)
     if error:
-        st.error("❌ Invalid function.")
+        st.error("Invalid function.")
         st.stop()
 
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
-
-    x0 = st.number_input("x₀", value=1.0)
-    y0 = st.number_input("y₀", value=1.0)
 
     st.latex(f"\\frac{{\\partial f}}{{\\partial x}} = {sp.latex(fx)}")
     st.latex(f"\\frac{{\\partial f}}{{\\partial y}} = {sp.latex(fy)}")
 
-    try:
-        fx_val = fx.subs({x: x0, y: y0})
-        fy_val = fy.subs({x: x0, y: y0})
-        st.success(f"At ({x0}, {y0}): ∂f/∂x = {fx_val},  ∂f/∂y = {fy_val}")
-    except Exception:
-        st.error("❌ Cannot evaluate derivatives at this point.")
+    x0 = st.slider("x₀", -3.0, 3.0, 1.0)
+    y0 = st.slider("y₀", -3.0, 3.0, 1.0)
 
-    st.info(
-        "Partial derivatives measure how the function changes when one variable "
-        "changes while the other is held constant."
+    fx_val = float(fx.subs({x: x0, y: y0}))
+    fy_val = float(fy.subs({x: x0, y: y0}))
+
+    st.success(
+        f"At ({x0}, {y0}): ∂f/∂x = {fx_val:.3f},  ∂f/∂y = {fy_val:.3f}"
     )
 
-# -------------------------------------------------
-# 3. Directional Derivatives
-# -------------------------------------------------
-elif topic == "Directional Derivatives":
-    st.header("Directional Derivatives")
+    # Cross-sections
+    t = np.linspace(-3, 3, 100)
+    f_np = sp.lambdify((x, y), f, "numpy")
 
-    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
-    st.caption("Examples: x^2+y^2, sin(xy), exp(x-y)")
-
-    f, error = parse_function(expr_input)
-    if error:
-        st.error("❌ Invalid function.")
-        st.stop()
-
-    fx = sp.diff(f, x)
-    fy = sp.diff(f, y)
-
-    x0 = st.number_input("x₀", value=1.0)
-    y0 = st.number_input("y₀", value=1.0)
-
-    vx = st.number_input("Direction vector v₁", value=1.0)
-    vy = st.number_input("Direction vector v₂", value=1.0)
-
-    if vx == 0 and vy == 0:
-        st.error("❌ Direction vector cannot be zero.")
-        st.stop()
-
-    v = np.array([vx, vy], dtype=float)
-    v_unit = v / np.linalg.norm(v)
-
-    try:
-        grad = np.array(
-            [fx.subs({x: x0, y: y0}), fy.subs({x: x0, y: y0})],
-            dtype=float
-        )
-        Dv = grad.dot(v_unit)
-        st.latex("D_v f = \\nabla f \\cdot \\hat{v}")
-        st.success(f"Directional derivative = {Dv:.3f}")
-    except Exception:
-        st.error("❌ Cannot compute directional derivative.")
+    fig, ax = plt.subplots()
+    ax.plot(t, f_np(t, y0), label="x varies, y fixed")
+    ax.plot(t, f_np(x0, t), label="y varies, x fixed")
+    ax.legend()
+    ax.set_xlabel("Variable")
+    ax.set_ylabel("f value")
+    st.pyplot(fig)
 
     st.info(
-        "The directional derivative gives the rate of change of f "
-        "in a specified direction."
+        "∂f/∂x measures change when x varies and y is fixed. "
+        "∂f/∂y measures change when y varies and x is fixed."
     )
 
-# -------------------------------------------------
-# 4. Gradient & Steepest Ascent
-# -------------------------------------------------
-elif topic == "Gradient & Steepest Ascent":
-    st.header("Gradient and Direction of Steepest Ascent")
-
-    expr_input = st.text_input("Enter f(x, y):", "x*y")
-    st.caption("Examples: xy, x^2+y^2, sin(x)+cos(y)")
-
-    f, error = parse_function(expr_input)
-    if error:
-        st.error("❌ Invalid function.")
-        st.stop()
-
-    fx = sp.diff(f, x)
-    fy = sp.diff(f, y)
-
-    x0 = st.number_input("x₀", value=1.0)
-    y0 = st.number_input("y₀", value=2.0)
-
-    try:
-        grad = sp.Matrix([fx, fy])
-        grad_val = grad.subs({x: x0, y: y0})
-        st.latex(f"\\nabla f = {sp.latex(grad)}")
-        st.success(f"Gradient at ({x0}, {y0}) = {grad_val}")
-    except Exception:
-        st.error("❌ Cannot compute gradient at this point.")
-
-    st.info(
-        "The gradient vector points in the direction of steepest ascent. "
-        "Its magnitude represents the maximum rate of increase."
-    )
-
-# -------------------------------------------------
-# 5. Differentials
-# -------------------------------------------------
+# =================================================
+# 3. Differentials
+# =================================================
 elif topic == "Differentials":
-    st.header("Differentials")
+    st.header("Differentials and Linear Approximation")
 
     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
-    st.caption("Examples: x^2+y^2, sin(xy), exp(x+y)")
-
     f, error = parse_function(expr_input)
     if error:
-        st.error("❌ Invalid function.")
+        st.error("Invalid function.")
         st.stop()
 
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
 
-    dx = st.number_input("dx", value=0.1)
-    dy = st.number_input("dy", value=0.1)
+    col1, col2 = st.columns(2)
+    with col1:
+        x0 = st.number_input("x₀", value=1.0)
+        y0 = st.number_input("y₀", value=1.0)
+    with col2:
+        dx = st.number_input("dx", value=0.1)
+        dy = st.number_input("dy", value=0.1)
 
-    try:
-        df = fx * dx + fy * dy
-        st.latex("df = f_x dx + f_y dy")
-        st.latex(f"df = {sp.latex(df)}")
-    except Exception:
-        st.error("❌ Cannot compute differential.")
+    f_np = sp.lambdify((x, y), f, "numpy")
+
+    actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
+    df = fx.subs({x: x0, y: y0}) * dx + fy.subs({x: x0, y: y0}) * dy
+
+    st.latex("df = f_x dx + f_y dy")
+    st.success(f"Differential (df) ≈ {float(df):.5f}")
+    st.info(f"Actual change Δf = {actual_change:.5f}")
+    st.warning(f"Approximation error = {abs(actual_change - df):.5e}")
 
     st.info(
-        "Differentials give a linear approximation of the change in the function "
-        "for small changes in x and y."
+        "Differentials give a linear approximation of the actual change in f. "
+        "The smaller dx and dy are, the better the approximation."
     )
