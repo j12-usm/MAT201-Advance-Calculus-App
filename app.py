@@ -72,7 +72,30 @@ if topic == "Function of Two Variables":
     X, Y = np.meshgrid(x_vals, y_vals)
     Z = f_np(X, Y)
 
+    # -------------------------------------------------
+    # Domain & Range
+    # -------------------------------------------------
+    st.subheader("Domain and Range")
+
+    st.markdown("**Domain:** All real values of x and y for which the function is defined.")
+
+    Z_finite = Z[np.isfinite(Z)]
+    z_min = np.min(Z_finite)
+    z_max = np.max(Z_finite)
+
+    st.markdown(
+        f"**Approximate Range (from plotted region):** "
+        f"[{z_min:.2f}, {z_max:.2f}]"
+    )
+
+    st.info(
+        "The domain depends on where the formula makes sense. "
+        "The range shown here is a numerical estimate based on the plotted surface."
+    )
+
+    # -------------------------------------------------
     # 3D surface
+    # -------------------------------------------------
     fig = plt.figure(figsize=(6, 5))
     ax = fig.add_subplot(projection="3d")
     ax.plot_surface(X, Y, Z, alpha=0.8)
@@ -82,7 +105,9 @@ if topic == "Function of Two Variables":
     ax.set_zlabel("f(x,y)")
     st.pyplot(fig)
 
+    # -------------------------------------------------
     # Contour plot
+    # -------------------------------------------------
     fig2, ax2 = plt.subplots()
     contour = ax2.contour(X, Y, Z, levels=15)
     ax2.clabel(contour)
@@ -92,11 +117,6 @@ if topic == "Function of Two Variables":
     st.pyplot(fig2)
 
     st.success(f"f({x0:.2f}, {y0:.2f}) = {f_np(x0, y0):.3f}")
-
-    st.info(
-        "A function of two variables assigns a value to each point (x, y). "
-        "The surface shows height, while contour lines show points with equal values."
-    )
 
 # =================================================
 # 2. Partial Derivatives
@@ -126,21 +146,33 @@ elif topic == "Partial Derivatives":
         f"At ({x0}, {y0}): ∂f/∂x = {fx_val:.3f},  ∂f/∂y = {fy_val:.3f}"
     )
 
-    # Cross-sections
+    # -------------------------------------------------
+    # Separate cross-sections
+    # -------------------------------------------------
     t = np.linspace(-3, 3, 100)
     f_np = sp.lambdify((x, y), f, "numpy")
 
-    fig, ax = plt.subplots()
-    ax.plot(t, f_np(t, y0), label="x varies, y fixed")
-    ax.plot(t, f_np(x0, t), label="y varies, x fixed")
-    ax.legend()
-    ax.set_xlabel("Variable")
-    ax.set_ylabel("f value")
-    st.pyplot(fig)
+    # Rate of change w.r.t x
+    fig_x, ax_x = plt.subplots()
+    ax_x.plot(t, f_np(t, y0))
+    ax_x.axvline(x0, linestyle="--")
+    ax_x.set_title("Rate of Change with Respect to x (y fixed)")
+    ax_x.set_xlabel("x")
+    ax_x.set_ylabel("f(x, y₀)")
+    st.pyplot(fig_x)
+
+    # Rate of change w.r.t y
+    fig_y, ax_y = plt.subplots()
+    ax_y.plot(t, f_np(x0, t))
+    ax_y.axvline(y0, linestyle="--")
+    ax_y.set_title("Rate of Change with Respect to y (x fixed)")
+    ax_y.set_xlabel("y")
+    ax_y.set_ylabel("f(x₀, y)")
+    st.pyplot(fig_y)
 
     st.info(
-        "∂f/∂x measures change when x varies and y is fixed. "
-        "∂f/∂y measures change when y varies and x is fixed."
+        "Each graph represents a cross-section of the surface. "
+        "The slope at the marked point corresponds to the partial derivative."
     )
 
 # =================================================
@@ -177,6 +209,6 @@ elif topic == "Differentials":
     st.warning(f"Approximation error = {abs(actual_change - df):.5e}")
 
     st.info(
-        "Differentials give a linear approximation of the actual change in f. "
-        "The smaller dx and dy are, the better the approximation."
+        "Differentials provide a linear approximation of the actual change in f. "
+        "The approximation improves as dx and dy become smaller."
     )
