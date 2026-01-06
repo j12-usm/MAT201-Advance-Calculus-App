@@ -52,13 +52,15 @@ def analyze_domain(expr):
     for arg in expr.atoms(sp.log):
         conditions.append(sp.latex(arg.args[0]) + r" > 0")
 
-    for denom in sp.denom(expr).as_ordered_factors():
+    denom = sp.denom(expr)
+    if denom != 1:
         conditions.append(sp.latex(denom) + r" \ne 0")
 
     if conditions:
-        return r"$\{(x,y)\in\mathbb{R}^2 : " + ",\ ".join(conditions) + r"\}$"
+        return r"\{(x,y)\in\mathbb{R}^2 \mid " + ",\ ".join(conditions) + r"\}"
     else:
-        return r"$\mathbb{R}^2$"
+        return r"\mathbb{R}^2"
+
 
 # -------------------------------------------------
 # Sidebar
@@ -193,20 +195,35 @@ elif topic == "Partial Derivatives":
     st.pyplot(fig_y)
 
 # =================================================
-# 3. Differentials (unchanged)
+# 3. Differentials (Improved Step-by-Step)
 # =================================================
 elif topic == "Differentials":
     st.header("Differentials and Linear Approximation")
 
-    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
+    expr_input = st.text_input(
+        "Enter f(x, y):",
+        "x^2 + y^2",
+        help="Examples: x^2 + y^2, sqrt(x^2+y^2), exp(x+y)"
+    )
+
+    st.caption(
+        "Valid examples: `x^2 + y^2`, `sqrt(x^2 + y^2)`, `exp(x+y)`"
+    )
+
     f, error = parse_function(expr_input)
     if error:
         st.error("Invalid function.")
         st.stop()
 
+    # Partial derivatives
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
 
+    st.subheader("Partial Derivatives")
+    st.latex(r"f_x = " + sp.latex(fx))
+    st.latex(r"f_y = " + sp.latex(fy))
+
+    # Inputs
     col1, col2 = st.columns(2)
     with col1:
         x0 = st.number_input("x₀", value=1.0)
@@ -215,11 +232,32 @@ elif topic == "Differentials":
         dx = st.number_input("dx", value=0.1)
         dy = st.number_input("dy", value=0.1)
 
+    # Symbolic differential
+    dx_sym, dy_sym = sp.symbols("dx dy")
+    df_symbolic = fx * dx_sym + fy * dy_sym
+
+    st.subheader("Differential Formula")
+    st.latex(r"df = f_x\,dx + f_y\,dy")
+    st.latex(r"df = " + sp.latex(df_symbolic))
+
+    # Substitute dx, dy
+    df_substituted = df_symbolic.subs({dx_sym: dx, dy_sym: dy})
+
+    st.subheader("Substitute dx and dy")
+    st.latex(r"df = " + sp.latex(df_substituted))
+
+    # Evaluate at (x0, y0)
+    df_numeric = df_substituted.subs({x: x0, y: y0})
+
     f_np = sp.lambdify((x, y), f, "numpy")
 
     actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
-    df = fx.subs({x:x0,y:y0})*dx + fy.subs({x:x0,y:y0})*dy
 
-    st.latex("df = f_x dx + f_y dy")
-    st.success(f"df ≈ {float(df):.5f}")
-    st.info(f"Actual Δf = {actual_change:.5f}")
+    st.success(f"df ≈ {float(df_numeric):.5f}")
+    st.info(f"Actual change Δf = {actual_change:.5f}")
+    st.warning(f"Approximation error = {abs(actual_change - float(df_numeric)):.5e}")
+
+    st.info(
+        "The differential provides a linear approximation to the actual change in the function. "
+        "The approximation improves as dx and dy become smaller."
+    )
