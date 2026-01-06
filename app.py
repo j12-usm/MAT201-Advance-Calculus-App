@@ -46,29 +46,46 @@ def parse_function(expr_input):
 def analyze_domain(expr):
     conditions = []
 
-    # Square root conditions
-    for arg in expr.atoms(sp.sqrt):
-        conditions.append(sp.latex(arg.args[0]) + r" \ge 0")
+    # ---------------------------------
+    # Square roots (fractional powers)
+    # ---------------------------------
+    for power in expr.atoms(sp.Pow):
+        if power.exp == sp.Rational(1, 2):
+            conditions.append(sp.latex(power.base) + r" \ge 0")
 
-    # Logarithm conditions
+    # ---------------------------------
+    # Logarithms
+    # ---------------------------------
     for arg in expr.atoms(sp.log):
         conditions.append(sp.latex(arg.args[0]) + r" > 0")
 
-    # Denominator conditions
+    # ---------------------------------
+    # Denominators
+    # ---------------------------------
     denom = sp.denom(expr)
     if denom != 1:
         conditions.append(sp.latex(denom) + r" \ne 0")
 
-    # Output formatting
+    # ---------------------------------
+    # Inverse trigonometric functions
+    # ---------------------------------
+    for arg in expr.atoms(sp.asin, sp.acos):
+        u = arg.args[0]
+        conditions.append(r"-1 \le " + sp.latex(u) + r" \le 1")
+
+    # atan has no restriction → ignore
+
+    # ---------------------------------
+    # Output formatting (your preferred style)
+    # ---------------------------------
     if conditions:
         return (
             r"\{(x,y)\in\mathbb{R}^2 \mid "
-            + ",\ ".join(conditions)
+            + ",\ ".join(dict.fromkeys(conditions))  # remove duplicates
             + r"\}"
         )
     else:
         return r"\mathbb{R}^2"
-
 
 # -------------------------------------------------
 # Sidebar
