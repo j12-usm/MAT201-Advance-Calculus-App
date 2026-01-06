@@ -46,18 +46,26 @@ def parse_function(expr_input):
 def analyze_domain(expr):
     conditions = []
 
+    # Square root conditions
     for arg in expr.atoms(sp.sqrt):
         conditions.append(sp.latex(arg.args[0]) + r" \ge 0")
 
+    # Logarithm conditions
     for arg in expr.atoms(sp.log):
         conditions.append(sp.latex(arg.args[0]) + r" > 0")
 
+    # Denominator conditions
     denom = sp.denom(expr)
     if denom != 1:
         conditions.append(sp.latex(denom) + r" \ne 0")
 
+    # Output formatting
     if conditions:
-        return r"\{(x,y)\in\mathbb{R}^2 \mid " + ",\ ".join(conditions) + r"\}"
+        return (
+            r"\{(x,y)\in\mathbb{R}^2 \mid "
+            + ",\ ".join(conditions)
+            + r"\}"
+        )
     else:
         return r"\mathbb{R}^2"
 
