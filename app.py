@@ -147,7 +147,7 @@ if topic == "Function of Two Variables":
 # 2. Partial Derivatives
 # =================================================
 elif topic == "Partial Derivatives":
-    st.header("Partial Derivatives")
+    st.header("Partial Derivatives as rate of change")
 
     expr_input = st.text_input("Enter f(x, y):", "x^2 + x*y")
     f, error = parse_function(expr_input)
@@ -155,33 +155,60 @@ elif topic == "Partial Derivatives":
         st.error("Invalid function syntax.")
         st.stop()
 
+    # Symbolic partial derivatives
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
 
     st.latex(r"\frac{\partial f}{\partial x} = " + sp.latex(fx))
     st.latex(r"\frac{\partial f}{\partial y} = " + sp.latex(fy))
 
+    # Evaluation point
     col1, col2 = st.columns(2)
-    with col1: x0 = st.number_input("x₀", value=1.0)
-    with col2: y0 = st.number_input("y₀", value=1.0)
+    with col1:
+        x0 = st.number_input("x₀", value=1.0)
+    with col2:
+        y0 = st.number_input("y₀", value=1.0)
 
-    st.success(f"At ({x0}, {y0}): ∂f/∂x = {float(fx.subs({x:x0,y:y0})):.3f}, ∂f/∂y = {float(fy.subs({x:x0,y:y0})):.3f}")
+    st.success(
+        f"At ({x0}, {y0}): "
+        f"∂f/∂x = {float(fx.subs({x:x0, y:y0})):.3f}, "
+        f"∂f/∂y = {float(fy.subs({x:x0, y:y0})):.3f}"
+    )
 
+    # Numeric function
     t = np.linspace(-3, 3, 100)
     f_np = sp.lambdify((x, y), f, "numpy")
 
+    # -------------------------------------------------
+    # Graph 1: Plane y = y0 (partial w.r.t x)
+    # -------------------------------------------------
+    st.markdown(
+        rf"**Graph 1:** Cross-section of the surface when the plane "
+        rf"$y = {y0}$ is fixed. This illustrates how $f(x,y)$ changes "
+        rf"with respect to $x$."
+    )
+
     fig_x, ax_x = plt.subplots()
     ax_x.plot(t, f_np(t, y0))
-    ax_x.axvline(x0, linestyle="--")
-    ax_x.set_title("Rate of Change w.r.t x")
-    ax_x.set_xlabel("x"); ax_x.set_ylabel("f(x, y₀)")
+    ax_x.set_title("Rate of Change with Respect to x (y fixed)")
+    ax_x.set_xlabel("x")
+    ax_x.set_ylabel("f(x, y₀)")
     st.pyplot(fig_x)
+
+    # -------------------------------------------------
+    # Graph 2: Plane x = x0 (partial w.r.t y)
+    # -------------------------------------------------
+    st.markdown(
+        rf"**Graph 2:** Cross-section of the surface when the plane "
+        rf"$x = {x0}$ is fixed. This illustrates how $f(x,y)$ changes "
+        rf"with respect to $y$."
+    )
 
     fig_y, ax_y = plt.subplots()
     ax_y.plot(t, f_np(x0, t))
-    ax_y.axvline(y0, linestyle="--")
-    ax_y.set_title("Rate of Change w.r.t y")
-    ax_y.set_xlabel("y"); ax_y.set_ylabel("f(x₀, y)")
+    ax_y.set_title("Rate of Change with Respect to y (x fixed)")
+    ax_y.set_xlabel("y")
+    ax_y.set_ylabel("f(x₀, y)")
     st.pyplot(fig_y)
 
 # =================================================
@@ -225,4 +252,3 @@ elif topic == "Differentials":
     st.info(f"Actual Δf = {actual_change:.5f}")
     st.warning(f"Approximation error = {abs(actual_change-float(df_numeric)):.5e}")
 
-    st.info("Differential provides a linear approximation; smaller dx/dy → better approximation.")
