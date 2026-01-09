@@ -150,38 +150,43 @@ if topic == "Function of Two Variables":
 
     z0 = f_np(x0, y0)
 
-    fig = go.Figure()
+        fig = go.Figure()
 
     # Surface
     fig.add_trace(go.Surface(
-        x=X, y=Y, z=Z,
+        x=X,
+        y=Y,
+        z=Z,
         colorscale="Viridis",
         opacity=0.85
     ))
 
     # High-contrast point
-fig.add_trace(go.Scatter3d(
-    x=[x0],
-    y=[y0],
-    z=[z0],
-    mode="markers+text",
-    marker=dict(
-        size=10,
-        color="black",          # Strong contrast
-        line=dict(
-            color="white",      # White outline
-            width=3
-        )
-    ),
-    text=[f"<b>({x0:.2f}, {y0:.2f}, {z0:.2f})</b>"],
-    textposition="top center",
-    textfont=dict(
-        color="black",
-        size=14
-    ),
-    name="Point"
-))
+    fig.add_trace(go.Scatter3d(
+        x=[x0],
+        y=[y0],
+        z=[z0],
+        mode="markers+text",
+        marker=dict(
+            size=10,
+            color="black",
+            line=dict(color="white", width=3)
+        ),
+        text=[f"<b>({x0:.2f}, {y0:.2f}, {z0:.2f})</b>"],
+        textposition="top center",
+        textfont=dict(size=14, color="black"),
+        name="Point"
+    ))
 
+    # Vertical guide line
+    fig.add_trace(go.Scatter3d(
+        x=[x0, x0],
+        y=[y0, y0],
+        z=[np.nanmin(Z), z0],
+        mode="lines",
+        line=dict(color="black", width=2, dash="dash"),
+        showlegend=False
+    ))
 
     fig.update_layout(
         scene=dict(
