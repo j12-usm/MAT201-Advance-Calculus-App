@@ -130,18 +130,22 @@ if topic == "Function of Two Variables":
     ax.plot_surface(X, Y, Z, alpha=0.8, cmap="viridis")
     ax.scatter(x0, y0, z0, color="red", s=50)
 
-    # Label
-    label_offset = (np.nanmax(Z)-np.nanmin(Z))*0.05
-    x_label = np.clip(x0 + label_offset, x_min, x_max)
-    y_label = np.clip(y0 + label_offset, y_min, y_max)
-    z_label = np.clip(z0 + label_offset, np.nanmin(Z), np.nanmax(Z))
-    ax.text(x_label, y_label, z_label, f"({x0:.2f}, {y0:.2f}, {z0:.2f})", fontsize=10, ha='left', va='bottom')
+    # Dynamic label positioning
+    label_offset = (np.nanmax(Z) - np.nanmin(Z)) * 0.05
+    x_label = x0 + label_offset if x0 < (x_min + x_max)/2 else x0 - label_offset
+    y_label = y0 + label_offset if y0 < (y_min + y_max)/2 else y0 - label_offset
+    z_label = z0 + label_offset
+
+    ax.text(x_label, y_label, z_label, f"({x0:.2f}, {y0:.2f}, {z0:.2f})", fontsize=10,
+            ha='left' if x0 < (x_min + x_max)/2 else 'right',
+            va='bottom')
 
     ax.view_init(elev=30, azim=45)
     ax.set_xlabel("x"); ax.set_ylabel("y"); ax.set_zlabel("f(x,y)")
     ax.set_xlim(x_min, x_max); ax.set_ylim(y_min, y_max)
     st.pyplot(fig)
     st.success(f"f({x0}, {y0}) = {z0:.3f}")
+
 
 # =================================================
 # 2. Partial Derivatives
