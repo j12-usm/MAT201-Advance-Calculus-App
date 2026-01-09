@@ -145,27 +145,81 @@ if topic == "Function of Two Variables":
     # ---------------------------------
     # Axis range controls (NEW)
     # ---------------------------------
+        # ---------------------------------
+    # Axis range controls (NUMBER + SLIDER, COORDINATED)
+    # ---------------------------------
     st.subheader("Axis Range Settings")
 
+    # Initialize session state (only once)
+    if "x_min" not in st.session_state:
+        st.session_state.x_min = -5.0
+        st.session_state.x_max = 5.0
+        st.session_state.y_min = -5.0
+        st.session_state.y_max = 5.0
+
     col3, col4 = st.columns(2)
+
+    # -------- x range --------
     with col3:
-        x_min, x_max = st.slider(
-            "x-range",
-            min_value=-10.0,
-            max_value=10.0,
-            value=(-5.0, 5.0),
-        )
-    with col4:
-        y_min, y_max = st.slider(
-            "y-range",
-            min_value=-10.0,
-            max_value=10.0,
-            value=(-5.0, 5.0),
+        st.markdown("**x-axis range**")
+
+        st.session_state.x_min = st.number_input(
+            "x minimum",
+            value=st.session_state.x_min,
+            key="x_min_input",
         )
 
-    if x_min >= x_max or y_min >= y_max:
+        st.session_state.x_max = st.number_input(
+            "x maximum",
+            value=st.session_state.x_max,
+            key="x_max_input",
+        )
+
+        st.session_state.x_min, st.session_state.x_max = st.slider(
+            "Adjust x-range",
+            min_value=-20.0,
+            max_value=20.0,
+            value=(st.session_state.x_min, st.session_state.x_max),
+            key="x_slider",
+        )
+
+    # -------- y range --------
+    with col4:
+        st.markdown("**y-axis range**")
+
+        st.session_state.y_min = st.number_input(
+            "y minimum",
+            value=st.session_state.y_min,
+            key="y_min_input",
+        )
+
+        st.session_state.y_max = st.number_input(
+            "y maximum",
+            value=st.session_state.y_max,
+            key="y_max_input",
+        )
+
+        st.session_state.y_min, st.session_state.y_max = st.slider(
+            "Adjust y-range",
+            min_value=-20.0,
+            max_value=20.0,
+            value=(st.session_state.y_min, st.session_state.y_max),
+            key="y_slider",
+        )
+
+    # Safety check
+    if (
+        st.session_state.x_min >= st.session_state.x_max
+        or st.session_state.y_min >= st.session_state.y_max
+    ):
         st.error("Minimum value must be less than maximum value.")
         st.stop()
+
+    # Assign final values
+    x_min = st.session_state.x_min
+    x_max = st.session_state.x_max
+    y_min = st.session_state.y_min
+    y_max = st.session_state.y_max
 
     # ---------------------------------
     # Domain
