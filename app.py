@@ -235,24 +235,34 @@ elif topic == "Partial Derivatives":
     ax2.legend()
     ax2.grid(True)
     st.pyplot(fig2)
-# =================================================
+# ================================================= 
 # 3. Differentials
 # =================================================
 elif topic == "Differentials":
     st.header("Differentials and Linear Approximation")
 
-    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
+    # -----------------------------
+    # Input function
+    # -----------------------------
+    expr_input = st.text_input("Enter f(x, y):", "x**2 + y**2")
     f, error = parse_function(expr_input)
     if error:
         st.error("Invalid function syntax.")
         st.stop()
 
+    # -----------------------------
+    # Partial derivatives
+    # -----------------------------
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
 
+    st.subheader("Symbolic Partial Derivatives")
     st.latex(r"f_x = " + sp.latex(fx))
     st.latex(r"f_y = " + sp.latex(fy))
 
+    # -----------------------------
+    # Input point and small changes
+    # -----------------------------
     col1, col2 = st.columns(2)
     with col1:
         x0 = st.number_input("x₀", value=1.0)
@@ -261,18 +271,53 @@ elif topic == "Differentials":
         dx = st.number_input("dx", value=0.1)
         dy = st.number_input("dy", value=0.1)
 
+    # -----------------------------
+    # Differential formula
+    # -----------------------------
     dx_sym, dy_sym = sp.symbols("dx dy")
-    df_symbolic = fx*dx_sym + fy*dy_sym
+    df_symbolic = fx * dx_sym + fy * dy_sym
 
+    st.subheader("Differential Formula")
     st.latex(r"df = f_x dx + f_y dy")
     st.latex(r"df = " + sp.latex(df_symbolic))
 
-    df_subs = df_symbolic.subs({dx_sym:dx, dy_sym:dy})
-    df_numeric = df_subs.subs({x:x0, y:y0})
-    f_np = sp.lambdify((x,y), f,"numpy")
-    actual_change = f_np(x0+dx, y0+dy) - f_np(x0, y0)
+    # -----------------------------
+    # Substitute dx and dy
+    # -----------------------------
+    df_subs = df_symbolic.subs({dx_sym: dx, dy_sym: dy})
+    df_numeric = df_subs.subs({x: x0, y: y0})
 
-    st.success(f"df ≈ {float(df_numeric):.5f}")
-    st.info(f"Actual Δf = {actual_change:.5f}")
-    st.warning(f"Approximation error = {abs(actual_change-float(df_numeric)):.5e}")
+    # -----------------------------
+    # Compute actual change
+    # -----------------------------
+    f_np = sp.lambdify((x, y), f, "numpy")
+    actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
+
+    # -----------------------------
+    # Display results
+    # -----------------------------
+    st.subheader(f"Evaluation at (x₀={x0}, y₀={y0}) with dx={dx}, dy={dy}")
+    st.success(f"Linear approximation df ≈ {float(df_numeric):.5f}")
+    st.info(f"Actual change Δf = {actual_change:.5f}")
+    st.warning(f"Approximation error = {abs(actual_change - float(df_numeric)):.5e}")
+
+    # -----------------------------
+    # Optional: visualize differential vs actual change
+    # -----------------------------
+    fig, ax = plt.subplots(figsize=(6,4))
+    # Original point
+    ax.scatter(x0, y0, color="green", s=50, label="Original point (x₀, y₀)")
+    # Approximation point
+    f_approx = f_np(x0, y0) + float(df_numeric)
+    ax.scatter(x0 + dx, y0 + dy, color="orange", s=50, label="Linear approximation f + df")
+    # Actual point
+    f_actual = f_np(x0 + dx, y0 + dy)
+    ax.scatter(x0 + dx, y0 + dy, color="red", s=50, label="Actual f(x₀+dx, y₀+dy)")
+    
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_title("Differential vs Actual Change")
+    ax.legend()
+    ax.grid(True)
+    st.pyplot(fig)
 
