@@ -147,7 +147,7 @@ if topic == "Function of Two Variables":
 # 2. Partial Derivatives
 # =================================================
 elif topic == "Partial Derivatives":
-    st.header("Partial Derivatives as rate of change")
+    st.header("Partial Derivatives as Rate of Change")
 
     expr_input = st.text_input("Enter f(x, y):", "x^2 + x*y")
     f, error = parse_function(expr_input)
@@ -175,40 +175,39 @@ elif topic == "Partial Derivatives":
         f"∂f/∂y = {float(fy.subs({x:x0, y:y0})):.3f}"
     )
 
-    # Numeric function
+    # Numeric lambdas for partial derivatives
     t = np.linspace(-3, 3, 100)
-    f_np = sp.lambdify((x, y), f, "numpy")
+    fx_np = sp.lambdify((x, y), fx, "numpy")
+    fy_np = sp.lambdify((x, y), fy, "numpy")
 
     # -------------------------------------------------
-    # Graph 1: Plane y = y0 (partial w.r.t x)
+    # Graph 1: Plane y = y0 → ∂f/∂x vs x
     # -------------------------------------------------
     st.markdown(
-        rf"**Graph 1:** Cross-section of the surface when the plane "
-        rf"$y = {y0}$ is fixed. This illustrates how $f(x,y)$ changes "
-        rf"with respect to $x$."
+        rf"**Graph 1:** Rate of change of $f$ with respect to $x$ "
+        rf"when the plane $y = {y0}$ is fixed."
     )
 
     fig_x, ax_x = plt.subplots()
-    ax_x.plot(t, f_np(t, y0))
-    ax_x.set_title("Rate of Change with Respect to x (y fixed)")
+    ax_x.plot(t, fx_np(t, y0))
+    ax_x.set_title(r"Rate of Change $\partial f / \partial x$ (y fixed)")
     ax_x.set_xlabel("x")
-    ax_x.set_ylabel("f(x, y₀)")
+    ax_x.set_ylabel(r"$\partial f / \partial x$")
     st.pyplot(fig_x)
 
     # -------------------------------------------------
-    # Graph 2: Plane x = x0 (partial w.r.t y)
+    # Graph 2: Plane x = x0 → ∂f/∂y vs y
     # -------------------------------------------------
     st.markdown(
-        rf"**Graph 2:** Cross-section of the surface when the plane "
-        rf"$x = {x0}$ is fixed. This illustrates how $f(x,y)$ changes "
-        rf"with respect to $y$."
+        rf"**Graph 2:** Rate of change of $f$ with respect to $y$ "
+        rf"when the plane $x = {x0}$ is fixed."
     )
 
     fig_y, ax_y = plt.subplots()
-    ax_y.plot(t, f_np(x0, t))
-    ax_y.set_title("Rate of Change with Respect to y (x fixed)")
+    ax_y.plot(t, fy_np(x0, t))
+    ax_y.set_title(r"Rate of Change $\partial f / \partial y$ (x fixed)")
     ax_y.set_xlabel("y")
-    ax_y.set_ylabel("f(x₀, y)")
+    ax_y.set_ylabel(r"$\partial f / \partial y$")
     st.pyplot(fig_y)
 
 # =================================================
