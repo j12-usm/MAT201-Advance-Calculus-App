@@ -74,7 +74,19 @@ if "x_min" not in st.session_state:
 if topic == "Function of Two Variables":
     st.header("📊 Function of Two Variables")
 
-    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
+    expr_input = st.text_input(
+    "Enter f(x, y):",
+    "x^2 + y^2",
+    help=(
+        "Use standard mathematical syntax.\n"
+        "Examples:\n"
+        "• sin(x*y)\n"
+        "• sqrt(x^2 + y^2)\n"
+        "• exp(x+y)\n"
+        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
+    ),
+)
+
     f, error = parse_function(expr_input)
 
     if error:
@@ -210,7 +222,19 @@ if topic == "Function of Two Variables":
 elif topic == "Partial Derivatives":
     st.header("Partial Derivatives as Rate of Change")
 
-    expr_input = st.text_input("Enter f(x, y):", "x**2 + x*y")
+    expr_input = st.text_input(
+    "Enter f(x, y):",
+    "x^2 + y^2",
+    help=(
+        "Use standard mathematical syntax.\n"
+        "Examples:\n"
+        "• sin(x*y)\n"
+        "• sqrt(x^2 + y^2)\n"
+        "• exp(x+y)\n"
+        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
+    ),
+)
+
     f, error = parse_function(expr_input)
     if error:
         st.error("Invalid function syntax.")
@@ -280,7 +304,19 @@ elif topic == "Differentials":
     # -----------------------------
     # Input function
     # -----------------------------
-    expr_input = st.text_input("Enter f(x, y):", "x**2 + y**2")
+    expr_input = st.text_input(
+    "Enter f(x, y):",
+    "x^2 + y^2",
+    help=(
+        "Use standard mathematical syntax.\n"
+        "Examples:\n"
+        "• sin(x*y)\n"
+        "• sqrt(x^2 + y^2)\n"
+        "• exp(x+y)\n"
+        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
+    ),
+)
+
     f, error = parse_function(expr_input)
     if error:
         st.error("Invalid function syntax.")
