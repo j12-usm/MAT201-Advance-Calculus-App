@@ -159,14 +159,29 @@ if topic == "Function of Two Variables":
         opacity=0.85
     ))
 
-    # Point
-    fig.add_trace(go.Scatter3d(
-        x=[x0], y=[y0], z=[z0],
-        mode="markers+text",
-        marker=dict(size=6, color="red"),
-        text=[f"({x0:.2f}, {y0:.2f}, {z0:.2f})"],
-        textposition="top center"
-    ))
+    # High-contrast point
+fig.add_trace(go.Scatter3d(
+    x=[x0],
+    y=[y0],
+    z=[z0],
+    mode="markers+text",
+    marker=dict(
+        size=10,
+        color="black",          # Strong contrast
+        line=dict(
+            color="white",      # White outline
+            width=3
+        )
+    ),
+    text=[f"<b>({x0:.2f}, {y0:.2f}, {z0:.2f})</b>"],
+    textposition="top center",
+    textfont=dict(
+        color="black",
+        size=14
+    ),
+    name="Point"
+))
+
 
     fig.update_layout(
         scene=dict(
