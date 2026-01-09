@@ -127,18 +127,21 @@ if topic == "Function of Two Variables":
     fig = plt.figure(figsize=(6,5))
     ax = fig.add_subplot(projection="3d")
     z0 = f_np(x0, y0)
-    ax.plot_surface(X, Y, Z, alpha=0.8, cmap="viridis")
-    ax.scatter(x0, y0, z0, color="red", s=50)
+
+    # Light surface
+    ax.plot_surface(X, Y, Z, alpha=0.3, color="skyblue", edgecolor='none')
+
+    # Darker point
+    ax.scatter(x0, y0, z0, color="darkred", s=70)
 
     # Dynamic label positioning
-    label_offset = (np.nanmax(Z) - np.nanmin(Z)) * 0.05
-    x_label = x0 + label_offset if x0 < (x_min + x_max)/2 else x0 - label_offset
-    y_label = y0 + label_offset if y0 < (y_min + y_max)/2 else y0 - label_offset
-    z_label = z0 + label_offset
+    x_label = x0 + (x_max - x_min)*0.03 if x0 < (x_min + x_max)/2 else x0 - (x_max - x_min)*0.03
+    y_label = y0  # keep same y for clarity
+    z_label = z0 + (np.nanmax(Z) - np.nanmin(Z))*0.02
 
     ax.text(x_label, y_label, z_label, f"({x0:.2f}, {y0:.2f}, {z0:.2f})", fontsize=10,
             ha='left' if x0 < (x_min + x_max)/2 else 'right',
-            va='bottom')
+            va='bottom', color='black')
 
     ax.view_init(elev=30, azim=45)
     ax.set_xlabel("x"); ax.set_ylabel("y"); ax.set_zlabel("f(x,y)")
