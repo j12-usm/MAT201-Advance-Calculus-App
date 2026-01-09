@@ -147,18 +147,22 @@ if topic == "Function of Two Variables":
 # 2. Partial Derivatives
 # =================================================
 elif topic == "Partial Derivatives":
-    st.header("Partial Derivatives as Rates of Change")
+    st.header("Partial Derivatives as Rate of Change")
 
+    # -----------------------------
+    # Input function
+    # -----------------------------
     expr_input = st.text_input("Enter f(x, y):", "x**2 + x*y")
     f, error = parse_function(expr_input)
     if error:
         st.error("Invalid function syntax.")
         st.stop()
 
-    # Compute partial derivatives
+    # Compute symbolic partial derivatives
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
 
+    st.subheader("Symbolic Partial Derivatives")
     st.latex(r"\frac{\partial f}{\partial x} = " + sp.latex(fx))
     st.latex(r"\frac{\partial f}{\partial y} = " + sp.latex(fy))
 
@@ -167,55 +171,70 @@ elif topic == "Partial Derivatives":
     # -----------------------------
     col1, col2 = st.columns(2)
     with col1:
-        x0 = st.number_input("x₀", value=1.0, min_value=-20.0, max_value=20.0)
+        x0 = st.number_input("x₀", value=1.0)
     with col2:
-        y0 = st.number_input("y₀", value=1.0, min_value=-20.0, max_value=20.0)
+        y0 = st.number_input("y₀", value=1.0)
 
-    st.success(
-        f"At ({x0}, {y0}): "
-        f"∂f/∂x = {float(fx.subs({x:x0, y:y0})):.3f}, "
-        f"∂f/∂y = {float(fy.subs({x:x0, y:y0})):.3f}"
-    )
+    # Display numeric values
+    fx_val = float(fx.subs({x:x0, y:y0}))
+    fy_val = float(fy.subs({x:x0, y:y0}))
+    st.success(f"At ({x0}, {y0}): ∂f/∂x = {fx_val:.3f}, ∂f/∂y = {fy_val:.3f}")
 
     # -----------------------------
-    # Visualization
+    # Convert to NumPy functions
     # -----------------------------
     f_np = sp.lambdify((x, y), f, "numpy")
     fx_np = sp.lambdify((x, y), fx, "numpy")
     fy_np = sp.lambdify((x, y), fy, "numpy")
 
-    t = np.linspace(-10, 10, 300)  # range for plotting
+    # -----------------------------
+    # Range for plotting
+    # -----------------------------
+    t = np.linspace(-5, 5, 200)
 
-    # Create side-by-side plots
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    # -----------------------------
+    # Plot f(x, y) and ∂f/∂x at y=y0
+    # -----------------------------
+    x_vals = t
+    y_fixed = np.full_like(x_vals, y0)  # shape match
+    fx_vals = fx_np(x_vals, y_fixed)
+    f_vals_x = f_np(x_vals, y_fixed)
 
-    # --------- x-direction ---------
-    ax1.plot(t, f_np(t, y0), label=f"f(x, {y0})", color="blue")
-    ax1.plot(t, fx_np(t, y0), label=f"∂f/∂x at y={y0}", color="red", linestyle="--")
-    ax1.axvline(x0, color="black", linestyle=":", label=f"x₀ = {x0}")
+    fig1, ax1 = plt.subplots(figsize=(6,4))
+    ax1.plot(x_vals, f_vals_x, label=f"f(x, {y0})", color="blue")
+    ax1.plot(x_vals, fx_vals, label=f"∂f/∂x at y={y0}", color="red", linestyle="--")
+    ax1.axvline(x0, color="black", linestyle=":", label=f"x₀={x0}")
     ax1.scatter(x0, f_np(x0, y0), color="green", s=50)
     ax1.text(x0, f_np(x0, y0), f"({x0:.2f},{f_np(x0,y0):.2f})", fontsize=9,
              ha="left", va="bottom", color="green")
-    ax1.set_title("Rate of Change w.r.t x")
     ax1.set_xlabel("x")
     ax1.set_ylabel("f(x, y₀) and ∂f/∂x")
+    ax1.set_title("Rate of Change w.r.t x")
     ax1.legend()
     ax1.grid(True)
+    st.pyplot(fig1)
 
-    # --------- y-direction ---------
-    ax2.plot(t, f_np(x0, t), label=f"f({x0}, y)", color="blue")
-    ax2.plot(t, fy_np(x0, t), label=f"∂f/∂y at x={x0}", color="red", linestyle="--")
-    ax2.axvline(y0, color="black", linestyle=":", label=f"y₀ = {y0}")
+    # -----------------------------
+    # Plot f(x, y) and ∂f/∂y at x=x0
+    # -----------------------------
+    y_vals = t
+    x_fixed = np.full_like(y_vals, x0)
+    fy_vals = fy_np(x_fixed, y_vals)
+    f_vals_y = f_np(x_fixed, y_vals)
+
+    fig2, ax2 = plt.subplots(figsize=(6,4))
+    ax2.plot(y_vals, f_vals_y, label=f"f({x0}, y)", color="blue")
+    ax2.plot(y_vals, fy_vals, label=f"∂f/∂y at x={x0}", color="red", linestyle="--")
+    ax2.axvline(y0, color="black", linestyle=":", label=f"y₀={y0}")
     ax2.scatter(y0, f_np(x0, y0), color="green", s=50)
     ax2.text(y0, f_np(x0, y0), f"({y0:.2f},{f_np(x0,y0):.2f})", fontsize=9,
              ha="left", va="bottom", color="green")
-    ax2.set_title("Rate of Change w.r.t y")
     ax2.set_xlabel("y")
     ax2.set_ylabel("f(x₀, y) and ∂f/∂y")
+    ax2.set_title("Rate of Change w.r.t y")
     ax2.legend()
     ax2.grid(True)
-
-    st.pyplot(fig)
+    st.pyplot(fig2)
 # =================================================
 # 3. Differentials
 # =================================================
