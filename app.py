@@ -71,14 +71,16 @@ if "x_min" not in st.session_state:
 # 1. Function of Two Variables
 # =================================================
 if topic == "Function of Two Variables":
-    st.header("Function of Two Variables")
+    st.header("📊 Function of Two Variables")
 
     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
     f, error = parse_function(expr_input)
+
     if error:
-        st.error("Invalid function syntax.")
+        st.error("❌ Invalid function syntax.")
         st.stop()
-    st.latex(f"f(x,y) = {sp.latex(f)}")
+
+    st.latex(rf"f(x,y) = {sp.latex(f)}")
 
     # Evaluation point
     col1, col2 = st.columns(2)
@@ -90,21 +92,36 @@ if topic == "Function of Two Variables":
     # Axis ranges
     col3, col4 = st.columns(2)
     with col3:
-        st.session_state.x_min = st.number_input("x min", value=st.session_state.x_min, min_value=X_LIMITS[0], max_value=X_LIMITS[1])
-        st.session_state.x_max = st.number_input("x max", value=st.session_state.x_max, min_value=X_LIMITS[0], max_value=X_LIMITS[1])
+        st.session_state.x_min = st.number_input(
+            "x min", value=st.session_state.x_min,
+            min_value=X_LIMITS[0], max_value=X_LIMITS[1]
+        )
+        st.session_state.x_max = st.number_input(
+            "x max", value=st.session_state.x_max,
+            min_value=X_LIMITS[0], max_value=X_LIMITS[1]
+        )
         if st.session_state.x_min >= st.session_state.x_max:
             st.session_state.x_min = st.session_state.x_max - 0.1
+
         st.session_state.x_min, st.session_state.x_max = st.slider(
             "Adjust x-range",
             min_value=st.session_state.x_min,
             max_value=st.session_state.x_max,
             value=(st.session_state.x_min, st.session_state.x_max)
         )
+
     with col4:
-        st.session_state.y_min = st.number_input("y min", value=st.session_state.y_min, min_value=Y_LIMITS[0], max_value=Y_LIMITS[1])
-        st.session_state.y_max = st.number_input("y max", value=st.session_state.y_max, min_value=Y_LIMITS[0], max_value=Y_LIMITS[1])
+        st.session_state.y_min = st.number_input(
+            "y min", value=st.session_state.y_min,
+            min_value=Y_LIMITS[0], max_value=Y_LIMITS[1]
+        )
+        st.session_state.y_max = st.number_input(
+            "y max", value=st.session_state.y_max,
+            min_value=Y_LIMITS[0], max_value=Y_LIMITS[1]
+        )
         if st.session_state.y_min >= st.session_state.y_max:
             st.session_state.y_min = st.session_state.y_max - 0.1
+
         st.session_state.y_min, st.session_state.y_max = st.slider(
             "Adjust y-range",
             min_value=st.session_state.y_min,
@@ -115,37 +132,56 @@ if topic == "Function of Two Variables":
     x_min, x_max = st.session_state.x_min, st.session_state.x_max
     y_min, y_max = st.session_state.y_min, st.session_state.y_max
 
-    st.subheader("Domain")
+    # Domain
+    st.subheader("📐 Domain")
     st.latex(analyze_domain(f))
 
-    # Plot
+    # -----------------------------
+    # Interactive 3D Plot (Plotly)
+    # -----------------------------
     f_np = sp.lambdify((x, y), f, "numpy")
-    X, Y = np.meshgrid(np.linspace(x_min, x_max, 120), np.linspace(y_min, y_max, 120))
+    X, Y = np.meshgrid(
+        np.linspace(x_min, x_max, 120),
+        np.linspace(y_min, y_max, 120)
+    )
     Z = f_np(X, Y)
     Z = np.where(np.isfinite(Z), Z, np.nan)
 
-    fig = plt.figure(figsize=(6,5))
-    ax = fig.add_subplot(projection="3d")
     z0 = f_np(x0, y0)
-    ax.plot_surface(X, Y, Z, alpha=0.8, cmap="viridis")
-    ax.scatter(x0, y0, z0, color="red", s=50)
 
-    # Dynamic label positioning
-    label_offset = (np.nanmax(Z) - np.nanmin(Z)) * 0.05
-    x_label = x0 + label_offset if x0 < (x_min + x_max)/2 else x0 - label_offset
-    y_label = y0 + label_offset if y0 < (y_min + y_max)/2 else y0 - label_offset
-    z_label = z0 + label_offset
+    fig = go.Figure()
 
-    ax.text(x_label, y_label, z_label, f"({x0:.2f}, {y0:.2f}, {z0:.2f})", fontsize=10,
-            ha='left' if x0 < (x_min + x_max)/2 else 'right',
-            va='bottom')
+    # Surface
+    fig.add_trace(go.Surface(
+        x=X, y=Y, z=Z,
+        colorscale="Viridis",
+        opacity=0.85
+    ))
 
-    ax.view_init(elev=30, azim=45)
-    ax.set_xlabel("x"); ax.set_ylabel("y"); ax.set_zlabel("f(x,y)")
-    ax.set_xlim(x_min, x_max); ax.set_ylim(y_min, y_max)
-    st.pyplot(fig)
-    st.success(f"f({x0}, {y0}) = {z0:.3f}")
+    # Point
+    fig.add_trace(go.Scatter3d(
+        x=[x0], y=[y0], z=[z0],
+        mode="markers+text",
+        marker=dict(size=6, color="red"),
+        text=[f"({x0:.2f}, {y0:.2f}, {z0:.2f})"],
+        textposition="top center"
+    ))
 
+    fig.update_layout(
+        scene=dict(
+            xaxis_title="x",
+            yaxis_title="y",
+            zaxis_title="f(x,y)",
+            xaxis=dict(range=[x_min, x_max]),
+            yaxis=dict(range=[y_min, y_max]),
+        ),
+        height=650,
+        margin=dict(l=0, r=0, b=0, t=30)
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.success(f"f({x0}, {y0}) = {z0:.4f}")
 
 # =================================================
 # 2. Partial Derivatives
