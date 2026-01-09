@@ -76,13 +76,14 @@ if topic == "Function of Two Variables":
 
     expr_input = st.text_input("Enter f(x, y):","x^2 + y^2")  
     st.caption(
-        "Use standard mathematical syntax.\n"
-        "Examples:\n"
-        "• sin(x*y)\n"
-        "• sqrt(x^2 + y^2)\n"
-        "• exp(x+y)\n"
-        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
-    )
+    "Use standard mathematical syntax.\n\n"
+    "Examples:\n\n"
+    "• sin(x*y)\n"
+    "• sqrt(x^2 + y^2)\n"
+    "• exp(x+y)\n\n"
+    "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
+)
+
     
 
     f, error = parse_function(expr_input)
@@ -164,12 +165,19 @@ if topic == "Function of Two Variables":
 
     # Surface
     fig.add_trace(go.Surface(
-        x=X,
-        y=Y,
-        z=Z,
-        colorscale="Viridis",
-        opacity=0.85
-    ))
+    x=X,
+    y=Y,
+    z=Z,
+    colorscale="Viridis",
+    opacity=0.85,
+    colorbar=dict(
+        title="f(x,y)",
+        x=1.15,        # move colorbar right
+        len=0.75,      # slightly shorter
+        thickness=18
+    )
+))
+
 
     # High-contrast point
     fig.add_trace(go.Scatter3d(
@@ -220,18 +228,16 @@ if topic == "Function of Two Variables":
 elif topic == "Partial Derivatives":
     st.header("Partial Derivatives as Rate of Change")
 
-    expr_input = st.text_input(
-    "Enter f(x, y):",
-    "x^2 + y^2",
-    help=(
-        "Use standard mathematical syntax.\n"
-        "Examples:\n"
-        "• sin(x*y)\n"
-        "• sqrt(x^2 + y^2)\n"
-        "• exp(x+y)\n"
-        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
-    ),
+    expr_input = st.text_input("Enter f(x, y):","x^2 + y^2")  
+    st.caption(
+    "Use standard mathematical syntax.\n\n"
+    "Examples:\n\n"
+    "• sin(x*y)\n"
+    "• sqrt(x^2 + y^2)\n"
+    "• exp(x+y)\n\n"
+    "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
 )
+
 
     f, error = parse_function(expr_input)
     if error:
@@ -302,18 +308,16 @@ elif topic == "Differentials":
     # -----------------------------
     # Input function
     # -----------------------------
-    expr_input = st.text_input(
-    "Enter f(x, y):",
-    "x^2 + y^2",
-    help=(
-        "Use standard mathematical syntax.\n"
-        "Examples:\n"
-        "• sin(x*y)\n"
-        "• sqrt(x^2 + y^2)\n"
-        "• exp(x+y)\n"
-        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
-    ),
+   expr_input = st.text_input("Enter f(x, y):","x^2 + y^2")  
+    st.caption(
+    "Use standard mathematical syntax.\n\n"
+    "Examples:\n\n"
+    "• sin(x*y)\n"
+    "• sqrt(x^2 + y^2)\n"
+    "• exp(x+y)\n\n"
+    "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
 )
+
 
     f, error = parse_function(expr_input)
     if error:
