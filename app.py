@@ -82,6 +82,12 @@ topic = st.sidebar.selectbox(
 )
 
 # -----------------------------
+# Axis min/max limits
+# -----------------------------
+X_LIMITS = (-20.0, 20.0)
+Y_LIMITS = (-20.0, 20.0)
+
+# -----------------------------
 # Initialize axis ranges in session state
 # -----------------------------
 if "x_min" not in st.session_state:
@@ -126,12 +132,12 @@ if topic == "Function of Two Variables":
     # -----------------------------
     col1, col2 = st.columns(2)
     with col1:
-        x0 = st.number_input("x₀", value=1.0)
+        x0 = st.number_input("x₀", value=1.0, min_value=X_LIMITS[0], max_value=X_LIMITS[1])
     with col2:
-        y0 = st.number_input("y₀", value=1.0)
+        y0 = st.number_input("y₀", value=1.0, min_value=Y_LIMITS[0], max_value=Y_LIMITS[1])
 
     # -----------------------------
-    # Axis range controls (coordinated)
+    # Axis range controls (coordinated, restricted)
     # -----------------------------
     st.subheader("Axis Range Settings")
     col3, col4 = st.columns(2)
@@ -140,15 +146,15 @@ if topic == "Function of Two Variables":
     with col3:
         st.markdown("**x-axis range**")
         st.session_state.x_min = st.number_input(
-            "x minimum", value=st.session_state.x_min, key="x_min_input"
+            "x minimum", value=st.session_state.x_min, min_value=X_LIMITS[0], max_value=X_LIMITS[1], key="x_min_input"
         )
         st.session_state.x_max = st.number_input(
-            "x maximum", value=st.session_state.x_max, key="x_max_input"
+            "x maximum", value=st.session_state.x_max, min_value=X_LIMITS[0], max_value=X_LIMITS[1], key="x_max_input"
         )
         st.session_state.x_min, st.session_state.x_max = st.slider(
             "Adjust x-range",
-            min_value=-20.0,
-            max_value=20.0,
+            min_value=X_LIMITS[0],
+            max_value=X_LIMITS[1],
             value=(st.session_state.x_min, st.session_state.x_max),
             key="x_slider",
         )
@@ -157,15 +163,15 @@ if topic == "Function of Two Variables":
     with col4:
         st.markdown("**y-axis range**")
         st.session_state.y_min = st.number_input(
-            "y minimum", value=st.session_state.y_min, key="y_min_input"
+            "y minimum", value=st.session_state.y_min, min_value=Y_LIMITS[0], max_value=Y_LIMITS[1], key="y_min_input"
         )
         st.session_state.y_max = st.number_input(
-            "y maximum", value=st.session_state.y_max, key="y_max_input"
+            "y maximum", value=st.session_state.y_max, min_value=Y_LIMITS[0], max_value=Y_LIMITS[1], key="y_max_input"
         )
         st.session_state.y_min, st.session_state.y_max = st.slider(
             "Adjust y-range",
-            min_value=-20.0,
-            max_value=20.0,
+            min_value=Y_LIMITS[0],
+            max_value=Y_LIMITS[1],
             value=(st.session_state.y_min, st.session_state.y_max),
             key="y_slider",
         )
@@ -229,7 +235,7 @@ if topic == "Function of Two Variables":
     st.success(f"f({x0}, {y0}) = {z0:.3f}")
 
 # =================================================
-# 2. Partial Derivatives
+# Partial Derivatives
 # =================================================
 elif topic == "Partial Derivatives":
     st.header("Partial Derivatives as Rates of Change")
@@ -254,9 +260,9 @@ elif topic == "Partial Derivatives":
 
     col1, col2 = st.columns(2)
     with col1:
-        x0 = st.number_input("x₀", value=1.0)
+        x0 = st.number_input("x₀", value=1.0, min_value=X_LIMITS[0], max_value=X_LIMITS[1])
     with col2:
-        y0 = st.number_input("y₀", value=1.0)
+        y0 = st.number_input("y₀", value=1.0, min_value=Y_LIMITS[0], max_value=Y_LIMITS[1])
 
     st.success(
         f"At ({x0}, {y0}): "
@@ -284,7 +290,7 @@ elif topic == "Partial Derivatives":
     st.pyplot(fig_y)
 
 # =================================================
-# 3. Differentials
+# Differentials
 # =================================================
 elif topic == "Differentials":
     st.header("Differentials and Linear Approximation")
@@ -310,8 +316,8 @@ elif topic == "Differentials":
 
     col1, col2 = st.columns(2)
     with col1:
-        x0 = st.number_input("x₀", value=1.0)
-        y0 = st.number_input("y₀", value=1.0)
+        x0 = st.number_input("x₀", value=1.0, min_value=X_LIMITS[0], max_value=X_LIMITS[1])
+        y0 = st.number_input("y₀", value=1.0, min_value=Y_LIMITS[0], max_value=Y_LIMITS[1])
     with col2:
         dx = st.number_input("dx", value=0.1)
         dy = st.number_input("dy", value=0.1)
