@@ -228,7 +228,7 @@ if topic == "Function of Two Variables":
 elif topic == "Partial Derivatives":
     st.header("Partial Derivatives as Rate of Change")
 
-     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
+    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
 
     st.caption(
         "Use standard mathematical syntax.\n\n"
