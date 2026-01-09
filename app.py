@@ -81,6 +81,15 @@ topic = st.sidebar.selectbox(
     ],
 )
 
+# -----------------------------
+# Initialize axis ranges in session state
+# -----------------------------
+if "x_min" not in st.session_state:
+    st.session_state.x_min = -5.0
+    st.session_state.x_max = 5.0
+    st.session_state.y_min = -5.0
+    st.session_state.y_max = 5.0
+
 # =================================================
 # 1. Function of Two Variables
 # =================================================
@@ -122,17 +131,9 @@ if topic == "Function of Two Variables":
         y0 = st.number_input("y₀", value=1.0)
 
     # -----------------------------
-    # Axis range controls
+    # Axis range controls (coordinated)
     # -----------------------------
     st.subheader("Axis Range Settings")
-
-    # Initialize session state
-    if "x_min" not in st.session_state:
-        st.session_state.x_min = -5.0
-        st.session_state.x_max = 5.0
-        st.session_state.y_min = -5.0
-        st.session_state.y_max = 5.0
-
     col3, col4 = st.columns(2)
 
     # X-axis
@@ -202,7 +203,6 @@ if topic == "Function of Two Variables":
     ax = fig.add_subplot(projection="3d")
 
     z0 = f_np(x0, y0)
-
     ax.plot_surface(X, Y, Z, alpha=0.8, cmap="viridis")
     ax.scatter(x0, y0, z0, color="red", s=50)
 
@@ -218,11 +218,7 @@ if topic == "Function of Two Variables":
         va="bottom",
     )
 
-    # Move Z-axis to the left
-    ax.view_init(elev=30, azim=240)
-    ax.zaxis.set_label_position('left')
-    ax.zaxis.set_tick_params(labelleft=True, labelright=False)
-
+    ax.view_init(elev=30, azim=45)
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("f(x,y)")
