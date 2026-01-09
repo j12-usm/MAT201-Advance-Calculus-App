@@ -175,27 +175,44 @@ elif topic == "Partial Derivatives":
         f"∂f/∂y = {float(fy.subs({x:x0, y:y0})):.3f}"
     )
 
+    # -------------------------------------------------
     # Numeric lambdas for partial derivatives
-t = np.linspace(-3, 3, 100)
+    # -------------------------------------------------
+    t = np.linspace(-3, 3, 100)
 
-# Ensure array output
-fx_np = sp.lambdify(x, fx.subs(y, y0), "numpy")
-fy_np = sp.lambdify(y, fy.subs(x, x0), "numpy")
+    # Fix one variable first (plane slicing)
+    fx_np = sp.lambdify(x, fx.subs(y, y0), "numpy")
+    fy_np = sp.lambdify(y, fy.subs(x, x0), "numpy")
 
-# -------------------------------------------------
-# Graph 1: Plane y = y0 → ∂f/∂x vs x
-# -------------------------------------------------
-st.markdown(
-    rf"**Graph 1:** Rate of change of $f$ with respect to $x$ "
-    rf"when the plane $y = {y0}$ is fixed."
-)
+    # -------------------------------------------------
+    # Graph 1: Plane y = y0 → ∂f/∂x vs x
+    # -------------------------------------------------
+    st.markdown(
+        rf"**Graph 1:** Rate of change of $f$ with respect to $x$ "
+        rf"when the plane $y = {y0}$ is fixed."
+    )
 
-fig_x, ax_x = plt.subplots()
-ax_x.plot(t, fx_np(t))
-ax_x.set_title(r"Rate of Change $\partial f / \partial x$ (y fixed)")
-ax_x.set_xlabel("x")
-ax_x.set_ylabel(r"$\partial f / \partial x$")
-st.pyplot(fig_x)
+    fig_x, ax_x = plt.subplots()
+    ax_x.plot(t, fx_np(t))
+    ax_x.set_title(r"Rate of Change $\partial f / \partial x$ (y fixed)")
+    ax_x.set_xlabel("x")
+    ax_x.set_ylabel(r"$\partial f / \partial x$")
+    st.pyplot(fig_x)
+
+    # -------------------------------------------------
+    # Graph 2: Plane x = x0 → ∂f/∂y vs y
+    # -------------------------------------------------
+    st.markdown(
+        rf"**Graph 2:** Rate of change of $f$ with respect to $y$ "
+        rf"when the plane $x = {x0}$ is fixed."
+    )
+
+    fig_y, ax_y = plt.subplots()
+    ax_y.plot(t, fy_np(t))
+    ax_y.set_title(r"Rate of Change $\partial f / \partial y$ (x fixed)")
+    ax_y.set_xlabel("y")
+    ax_y.set_ylabel(r"$\partial f / \partial y$")
+    st.pyplot(fig_y)
 
 # -------------------------------------------------
 # Graph 2: Plane x = x0 → ∂f/∂y vs y
