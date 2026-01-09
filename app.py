@@ -232,8 +232,8 @@ elif topic == "Differentials":
     fy = sp.diff(f, y)
 
     st.subheader("Symbolic Partial Derivatives")
-    st.latex(r"f_x = " + sp.latex(fx))
-    st.latex(r"f_y = " + sp.latex(fy))
+    st.latex(r"fx = " + sp.latex(fx))
+    st.latex(r"fy = " + sp.latex(fy))
 
     # -----------------------------
     # Input point and increments
@@ -247,27 +247,31 @@ elif topic == "Differentials":
         dy = st.number_input("dy", value=0.1)
 
     # -----------------------------
-    # Evaluate fx and fy at (x0, y0)
+    # Evaluate fx and fy at point
     # -----------------------------
-    fx_val = float(fx.subs({x: x0, y: y0}))
-    fy_val = float(fy.subs({x: x0, y: y0}))
+    fx_sub = fx.subs({x: x0, y: y0})
+    fy_sub = fy.subs({x: x0, y: y0})
+    fx_val = float(fx_sub)
+    fy_val = float(fy_sub)
 
-    # -----------------------------
-    # Differential df = fx*dx + fy*dy
-    # -----------------------------
     st.subheader("Differential df")
-    st.latex(r"df = f_x dx + f_y dy")
+    st.latex(r"df = fx*dx + fy*dy")
 
-    # Show substitution explicitly
-    df_expression = fx_val * dx + fy_val * dy
+    # Step-by-step substitution for fx*dx
+    st.markdown(f"Step 1: Evaluate fx and fy at (x₀,y₀)")
+    st.markdown(f"fx = {sp.latex(fx)} → fx({x0},{y0}) = {sp.latex(fx_sub)} → numeric: {fx_val}")
+    st.markdown(f"fy = {sp.latex(fy)} → fy({x0},{y0}) = {sp.latex(fy_sub)} → numeric: {fy_val}")
+
+    # Step 2: Multiply by dx and dy with substitution
+    df_x = fx_val * dx
+    df_y = fy_val * dy
+    df_numeric = df_x + df_y
+
     st.markdown(
-        f"Substitute f_x({x0},{y0}) = {fx_val}, f_y({x0},{y0}) = {fy_val}, "
-        f"dx = {dx}, dy = {dy}:"
+        f"Step 2: Multiply by increments dx, dy:\n"
+        f"df = fx*dx + fy*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {df_numeric:.5f}"
     )
-    st.latex(r"df \approx ({:.3f})*({:.3f}) + ({:.3f})*({:.3f}) = {:.5f}".format(
-        fx_val, dx, fy_val, dy, df_expression
-    ))
-    st.success(f"Numeric value: df ≈ {df_expression:.5f}")
+    st.success(f"Numeric value: df ≈ {df_numeric:.5f}")
 
     # -----------------------------
     # Actual change Δf
@@ -278,7 +282,7 @@ elif topic == "Differentials":
         f"Actual change Δf = f(x₀+dx, y₀+dy) - f(x₀, y₀) = "
         f"f({x0+dx},{y0+dy}) - f({x0},{y0}) = {actual_change:.5f}"
     )
-    st.warning(f"Error of differential approximation = |Δf - df| = {abs(actual_change - df_expression):.5e}")
+    st.warning(f"Error of differential approximation = |Δf - df| = {abs(actual_change - df_numeric):.5e}")
 
     # -----------------------------
     # Linear approximation (tangent plane)
@@ -286,25 +290,18 @@ elif topic == "Differentials":
     L = f.subs({x: x0, y: y0}) + fx_val*(x - x0) + fy_val*(y - y0)
 
     st.subheader("Linear Approximation (Tangent Plane)")
-    st.latex(r"L(x,y) = f(x_0, y_0) + f_x(x_0, y_0) (x-x_0) + f_y(x_0, y_0) (y-y_0)")
+    st.latex(r"L(x,y) = f(x₀, y₀) + fx(x₀,y₀) (x-x₀) + fy(x₀,y₀) (y-y₀)")
 
-    # Show substitution step
+    # Show substitution in L
     f_at_point = float(f.subs({x: x0, y: y0}))
-    st.latex(
-        r"L(x,y) = {:.5f} + ({:.3f})*(x-{:.3f}) + ({:.3f})*(y-{:.3f})".format(
-            f_at_point, fx_val, x0, fy_val, y0
-        )
-    )
-
-    # Evaluate linear approximation at (x0+dx, y0+dy)
-    L_increment = (fx_val * dx) + (fy_val * dy)
+    L_increment = df_numeric
     L_approx = f_at_point + L_increment
     true_value = f_np(x0 + dx, y0 + dy)
     linear_error = abs(true_value - L_approx)
 
+    st.markdown(f"f({x0},{y0}) = {f_at_point:.5f}")
     st.markdown(
-        f"L(x₀, y₀) = f({x0},{y0}) = {f_at_point:.5f}\n"
-        f"Increment = f_x*dx + f_y*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {L_increment:.5f}"
+        f"Increment = fx*dx + fy*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {L_increment:.5f}"
     )
     st.success(f"L(x₀ + dx, y₀ + dy) ≈ {L_approx:.5f}")
     st.info(f"True f(x₀ + dx, y₀ + dy) = {true_value:.5f}")
@@ -312,10 +309,11 @@ elif topic == "Differentials":
 
     st.info(
         "Summary:\n"
-        "- Differential df gives the linear change: df = f_x dx + f_y dy\n"
+        "- Differential df shows the linear change: df = fx*dx + fy*dy\n"
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
+
 
 
 
