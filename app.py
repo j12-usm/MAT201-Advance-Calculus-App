@@ -242,7 +242,7 @@ if topic == "Function of Two Variables":
     fig = plt.figure(figsize=(6, 5))
     ax = fig.add_subplot(projection="3d")
 
-   z0 = f_np(x0, y0)
+  z0 = f_np(x0, y0)
 
 ax.plot_surface(X, Y, Z, alpha=0.8)
 ax.scatter(x0, y0, z0, color="red", s=50)
@@ -257,7 +257,6 @@ ax.text(
     fontsize=10,
     ha="left",
 )
-
 
     ax.set_xlabel("x")
     ax.set_ylabel("y")
