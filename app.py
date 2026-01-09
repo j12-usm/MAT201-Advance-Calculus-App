@@ -148,7 +148,7 @@ if topic == "Function of Two Variables":
     Z = f_np(X, Y)
     Z = np.where(np.isfinite(Z), Z, np.nan)
 
-        z0 = f_np(x0, y0)
+    z0 = f_np(x0, y0)
 
     fig = go.Figure()
 
