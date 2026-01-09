@@ -102,6 +102,9 @@ topic = st.sidebar.selectbox(
 # =================================================
 # 1. Function of Two Variables
 # =================================================
+# =================================================
+# 1. Function of Two Variables
+# =================================================
 if topic == "Function of Two Variables":
     st.header("Meaning of a Function of Two Variables")
 
@@ -130,32 +133,71 @@ if topic == "Function of Two Variables":
 
     st.latex(f"f(x,y) = {sp.latex(f)}")
 
-    # User-defined evaluation point
+    # ---------------------------------
+    # Evaluation point
+    # ---------------------------------
     col1, col2 = st.columns(2)
     with col1:
         x0 = st.number_input("x₀", value=1.0)
     with col2:
         y0 = st.number_input("y₀", value=1.0)
 
+    # ---------------------------------
+    # Axis range controls (NEW)
+    # ---------------------------------
+    st.subheader("Axis Range Settings")
+
+    col3, col4 = st.columns(2)
+    with col3:
+        x_min, x_max = st.slider(
+            "x-range",
+            min_value=-10.0,
+            max_value=10.0,
+            value=(-5.0, 5.0),
+        )
+    with col4:
+        y_min, y_max = st.slider(
+            "y-range",
+            min_value=-10.0,
+            max_value=10.0,
+            value=(-5.0, 5.0),
+        )
+
+    if x_min >= x_max or y_min >= y_max:
+        st.error("Minimum value must be less than maximum value.")
+        st.stop()
+
+    # ---------------------------------
     # Domain
+    # ---------------------------------
     st.subheader("Domain")
     st.latex(analyze_domain(f))
 
+    # ---------------------------------
     # Plot
+    # ---------------------------------
     f_np = sp.lambdify((x, y), f, "numpy")
 
-    x_vals = np.linspace(-5, 5, 100)
-    y_vals = np.linspace(-5, 5, 100)
+    x_vals = np.linspace(x_min, x_max, 120)
+    y_vals = np.linspace(y_min, y_max, 120)
     X, Y = np.meshgrid(x_vals, y_vals)
+
     Z = f_np(X, Y)
+    Z = np.where(np.isfinite(Z), Z, np.nan)  # safety for domain issues
 
     fig = plt.figure(figsize=(6, 5))
     ax = fig.add_subplot(projection="3d")
+
     ax.plot_surface(X, Y, Z, alpha=0.8)
     ax.scatter(x0, y0, f_np(x0, y0), color="red", s=50)
+
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("f(x,y)")
+
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(y_min, y_max)
+
     st.pyplot(fig)
 
     st.success(f"f({x0}, {y0}) = {f_np(x0, y0):.3f}")
