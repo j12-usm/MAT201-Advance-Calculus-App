@@ -282,7 +282,15 @@ elif topic == "Differentials":
         f"Actual change Δf = f(x₀+dx, y₀+dy) - f(x₀, y₀) = "
         f"f({x0+dx},{y0+dy}) - f({x0},{y0}) = {actual_change:.5f}"
     )
-    st.warning(f"Error of differential approximation = |Δf - df| = {abs(actual_change - df_numeric):.5e}")
+
+    # Format error in scientific notation as *10^a
+    error_value = abs(actual_change - df_numeric)
+    if error_value != 0:
+        error_sci = f"{error_value/10**int(np.floor(np.log10(error_value))):.3f}*10^{int(np.floor(np.log10(error_value)))}"
+    else:
+        error_sci = "0"
+
+    st.warning(f"Error of differential approximation = |Δf - df| ≈ {error_sci}")
 
     # -----------------------------
     # Linear approximation (tangent plane)
@@ -299,13 +307,19 @@ elif topic == "Differentials":
     true_value = f_np(x0 + dx, y0 + dy)
     linear_error = abs(true_value - L_approx)
 
+    # Linear error in *10^a format
+    if linear_error != 0:
+        linear_error_sci = f"{linear_error/10**int(np.floor(np.log10(linear_error))):.3f}*10^{int(np.floor(np.log10(linear_error)))}"
+    else:
+        linear_error_sci = "0"
+
     st.markdown(f"f({x0},{y0}) = {f_at_point:.5f}")
     st.markdown(
         f"Increment = fx*dx + fy*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {L_increment:.5f}"
     )
     st.success(f"L(x₀ + dx, y₀ + dy) ≈ {L_approx:.5f}")
     st.info(f"True f(x₀ + dx, y₀ + dy) = {true_value:.5f}")
-    st.warning(f"Linear approximation error = {linear_error:.5e}")
+    st.warning(f"Linear approximation error ≈ {linear_error_sci}")
 
     st.info(
         "Summary:\n"
@@ -313,6 +327,7 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
+
 
 
 
