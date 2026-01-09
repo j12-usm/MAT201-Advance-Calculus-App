@@ -263,40 +263,82 @@ elif topic == "Differentials":
         dx = st.number_input("dx", value=0.1)
         dy = st.number_input("dy", value=0.1)
 
-    # -------------------------------------------------
-    # Differential
-    # -------------------------------------------------
+   # =================================================
+# 3. Differentials
+# =================================================
+elif topic == "Differentials":
+    st.header("Differentials and Linear Approximation")
+
+    # -----------------------------
+    # Input function
+    # -----------------------------
+    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
+    f, error = parse_function(expr_input)
+    if error:
+        st.error("Invalid function syntax.")
+        st.stop()
+
+    # -----------------------------
+    # Partial derivatives
+    # -----------------------------
+    fx = sp.diff(f, x)
+    fy = sp.diff(f, y)
+
+    st.subheader("Symbolic Partial Derivatives")
+    st.latex(r"f_x = " + sp.latex(fx))
+    st.latex(r"f_y = " + sp.latex(fy))
+
+    # -----------------------------
+    # Input point and increments
+    # -----------------------------
+    col1, col2 = st.columns(2)
+    with col1:
+        x0 = st.number_input("x₀", value=1.0)
+        y0 = st.number_input("y₀", value=1.0)
+    with col2:
+        dx = st.number_input("dx", value=0.1)
+        dy = st.number_input("dy", value=0.1)
+
+    # -----------------------------
+    # Differential df = fx dx + fy dy
+    # -----------------------------
     dx_sym, dy_sym = sp.symbols("dx dy")
     df_symbolic = fx * dx_sym + fy * dy_sym
 
+    st.subheader("Differential (df)")
     st.latex(r"df = f_x dx + f_y dy")
     st.latex(r"df = " + sp.latex(df_symbolic))
 
-    df_subs = df_symbolic.subs({dx_sym: dx, dy_sym: dy})
-    df_numeric = df_subs.subs({x: x0, y: y0})
+    # Substitute dx and dy (still showing as ax dx + by dy)
+    df_with_values = df_symbolic.subs({dx_sym: dx, dy_sym: dy})
+    df_numeric = df_with_values.subs({x: x0, y: y0})
+    
+    # Extract coefficients for display in ax dx + by dy form
+    fx_val = float(fx.subs({x: x0, y: y0}))
+    fy_val = float(fy.subs({x: x0, y: y0}))
+    st.latex(r"df \approx " + f"{fx_val:.3f}·dx + {fy_val:.3f}·dy")
+    st.success(f"Numeric value: df ≈ {float(df_numeric):.5f}")
 
+    # -----------------------------
+    # Actual change Δf
+    # -----------------------------
     f_np = sp.lambdify((x, y), f, "numpy")
     actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
+    st.info(f"Actual change Δf = f(x₀+dx, y₀+dy) - f(x₀,y₀) = {actual_change:.5f}")
+    st.warning(f"Error of differential approximation = |Δf - df| = {abs(actual_change - float(df_numeric)):.5e}")
 
-    st.success(f"df ≈ {float(df_numeric):.5f}")
-    st.info(f"Actual Δf = {actual_change:.5f}")
-    st.warning(
-        f"Approximation error (|Δf − df|) = {abs(actual_change - float(df_numeric)):.5e}"
-    )
-
-    # -------------------------------------------------
+    # -----------------------------
     # Linear approximation (tangent plane)
-    # -------------------------------------------------
+    # -----------------------------
     L = (
         f.subs({x: x0, y: y0})
         + fx.subs({x: x0, y: y0}) * (x - x0)
         + fy.subs({x: x0, y: y0}) * (y - y0)
     )
-
     st.subheader("Linear Approximation (Tangent Plane)")
     st.latex(r"L(x,y) = " + sp.latex(L))
 
-    # Linear approximation value
+    # Evaluate linear approximation at (x0+dx, y0+dy)
     L_approx = L.subs({x: x0 + dx, y: y0 + dy})
     true_value = f_np(x0 + dx, y0 + dy)
     linear_error = abs(true_value - float(L_approx))
@@ -306,7 +348,9 @@ elif topic == "Differentials":
     st.warning(f"Linear approximation error = {linear_error:.5e}")
 
     st.info(
-        "The linear approximation uses the tangent plane at (x₀, y₀). "
-        "Smaller values of dx and dy give a better approximation."
+        "Summary:\n"
+        "- Differential df gives the linear change: df = f_x dx + f_y dy\n"
+        "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
+        "- Smaller dx, dy → better approximation"
     )
 
