@@ -74,16 +74,16 @@ if "x_min" not in st.session_state:
 if topic == "Function of Two Variables":
     st.header("📊 Function of Two Variables")
 
-    expr_input = st.text_input("Enter f(x, y):","x^2 + y^2")  
-    st.caption(
-    "Use standard mathematical syntax.\n\n"
-    "Examples:\n\n"
-    "• sin(x*y)\n"
-    "• sqrt(x^2 + y^2)\n"
-    "• exp(x+y)\n\n"
-    "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
-)
+     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
 
+    st.caption(
+        "Use standard mathematical syntax.\n\n"
+        "Examples:\n\n"
+        "• sin(x*y)\n"
+        "• sqrt(x^2 + y^2)\n"
+        "• exp(x+y)\n\n"
+        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
+    )
     
 
     f, error = parse_function(expr_input)
@@ -228,15 +228,16 @@ if topic == "Function of Two Variables":
 elif topic == "Partial Derivatives":
     st.header("Partial Derivatives as Rate of Change")
 
-    expr_input = st.text_input("Enter f(x, y):","x^2 + y^2")  
+     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
+
     st.caption(
-    "Use standard mathematical syntax.\n\n"
-    "Examples:\n\n"
-    "• sin(x*y)\n"
-    "• sqrt(x^2 + y^2)\n"
-    "• exp(x+y)\n\n"
-    "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
-)
+        "Use standard mathematical syntax.\n\n"
+        "Examples:\n\n"
+        "• sin(x*y)\n"
+        "• sqrt(x^2 + y^2)\n"
+        "• exp(x+y)\n\n"
+        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
+    )
 
 
     f, error = parse_function(expr_input)
@@ -308,15 +309,16 @@ elif topic == "Differentials":
     # -----------------------------
     # Input function
     # -----------------------------
-   expr_input = st.text_input("Enter f(x, y):","x^2 + y^2")  
+    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
+
     st.caption(
-    "Use standard mathematical syntax.\n\n"
-    "Examples:\n\n"
-    "• sin(x*y)\n"
-    "• sqrt(x^2 + y^2)\n"
-    "• exp(x+y)\n\n"
-    "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
-)
+        "Use standard mathematical syntax.\n\n"
+        "Examples:\n\n"
+        "• sin(x*y)\n"
+        "• sqrt(x^2 + y^2)\n"
+        "• exp(x+y)\n\n"
+        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
+    )
 
 
     f, error = parse_function(expr_input)
