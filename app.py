@@ -282,7 +282,7 @@ elif topic == "Differentials":
     st.latex(r"df = " + sp.latex(df_symbolic))
 
     # -----------------------------
-    # Substitute dx and dy
+    # Evaluate differential at given dx, dy
     # -----------------------------
     df_subs = df_symbolic.subs({dx_sym: dx, dy_sym: dy})
     df_numeric = df_subs.subs({x: x0, y: y0})
@@ -300,24 +300,3 @@ elif topic == "Differentials":
     st.success(f"Linear approximation df ≈ {float(df_numeric):.5f}")
     st.info(f"Actual change Δf = {actual_change:.5f}")
     st.warning(f"Approximation error = {abs(actual_change - float(df_numeric)):.5e}")
-
-    # -----------------------------
-    # Optional: visualize differential vs actual change
-    # -----------------------------
-    fig, ax = plt.subplots(figsize=(6,4))
-    # Original point
-    ax.scatter(x0, y0, color="green", s=50, label="Original point (x₀, y₀)")
-    # Approximation point
-    f_approx = f_np(x0, y0) + float(df_numeric)
-    ax.scatter(x0 + dx, y0 + dy, color="orange", s=50, label="Linear approximation f + df")
-    # Actual point
-    f_actual = f_np(x0 + dx, y0 + dy)
-    ax.scatter(x0 + dx, y0 + dy, color="red", s=50, label="Actual f(x₀+dx, y₀+dy)")
-    
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
-    ax.set_title("Differential vs Actual Change")
-    ax.legend()
-    ax.grid(True)
-    st.pyplot(fig)
-
