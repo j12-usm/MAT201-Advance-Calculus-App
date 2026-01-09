@@ -247,12 +247,14 @@ elif topic == "Differentials":
         st.error("Invalid function syntax.")
         st.stop()
 
+    # Partial derivatives
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
 
     st.latex(r"f_x = " + sp.latex(fx))
     st.latex(r"f_y = " + sp.latex(fy))
 
+    # Point and increments
     col1, col2 = st.columns(2)
     with col1:
         x0 = st.number_input("x₀", value=1.0)
@@ -261,39 +263,50 @@ elif topic == "Differentials":
         dx = st.number_input("dx", value=0.1)
         dy = st.number_input("dy", value=0.1)
 
+    # -------------------------------------------------
+    # Differential
+    # -------------------------------------------------
     dx_sym, dy_sym = sp.symbols("dx dy")
-    df_symbolic = fx*dx_sym + fy*dy_sym
+    df_symbolic = fx * dx_sym + fy * dy_sym
 
     st.latex(r"df = f_x dx + f_y dy")
     st.latex(r"df = " + sp.latex(df_symbolic))
 
-    # -------------------------------------------------
-# Linear approximation (tangent plane)
-# -------------------------------------------------
-L = f.subs({x: x0, y: y0}) \
-    + fx.subs({x: x0, y: y0}) * (x - x0) \
-    + fy.subs({x: x0, y: y0}) * (y - y0)
+    df_subs = df_symbolic.subs({dx_sym: dx, dy_sym: dy})
+    df_numeric = df_subs.subs({x: x0, y: y0})
 
-st.latex(r"L(x,y) = " + sp.latex(L))
-
-# Linear approximation value using dx, dy
-L_approx = L.subs({x: x0 + dx, y: y0 + dy})
-
-st.success(f"Linear approximation L(x₀+dx, y₀+dy) ≈ {float(L_approx):.5f}")
-
-# Compare values
-true_value = f_np(x0 + dx, y0 + dy)
-approx_error = abs(true_value - float(L_approx))
-
-st.info(f"True f(x₀+dx, y₀+dy) = {true_value:.5f}")
-st.warning(f"Linear approximation error = {approx_error:.5e}")
-
-
-    df_subs = df_symbolic.subs({dx_sym:dx, dy_sym:dy})
-    df_numeric = df_subs.subs({x:x0, y:y0})
-    f_np = sp.lambdify((x,y), f,"numpy")
-    actual_change = f_np(x0+dx, y0+dy) - f_np(x0, y0)
+    f_np = sp.lambdify((x, y), f, "numpy")
+    actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
 
     st.success(f"df ≈ {float(df_numeric):.5f}")
     st.info(f"Actual Δf = {actual_change:.5f}")
-    st.warning(f"Approximation error = {abs(actual_change-float(df_numeric)):.5e}")
+    st.warning(
+        f"Approximation error (|Δf − df|) = {abs(actual_change - float(df_numeric)):.5e}"
+    )
+
+    # -------------------------------------------------
+    # Linear approximation (tangent plane)
+    # -------------------------------------------------
+    L = (
+        f.subs({x: x0, y: y0})
+        + fx.subs({x: x0, y: y0}) * (x - x0)
+        + fy.subs({x: x0, y: y0}) * (y - y0)
+    )
+
+    st.subheader("Linear Approximation (Tangent Plane)")
+    st.latex(r"L(x,y) = " + sp.latex(L))
+
+    # Linear approximation value
+    L_approx = L.subs({x: x0 + dx, y: y0 + dy})
+    true_value = f_np(x0 + dx, y0 + dy)
+    linear_error = abs(true_value - float(L_approx))
+
+    st.success(f"L(x₀ + dx, y₀ + dy) ≈ {float(L_approx):.5f}")
+    st.info(f"True f(x₀ + dx, y₀ + dy) = {true_value:.5f}")
+    st.warning(f"Linear approximation error = {linear_error:.5e}")
+
+    st.info(
+        "The linear approximation uses the tangent plane at (x₀, y₀). "
+        "Smaller values of dx and dy give a better approximation."
+    )
+
