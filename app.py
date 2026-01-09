@@ -242,8 +242,22 @@ if topic == "Function of Two Variables":
     fig = plt.figure(figsize=(6, 5))
     ax = fig.add_subplot(projection="3d")
 
-    ax.plot_surface(X, Y, Z, alpha=0.8)
-    ax.scatter(x0, y0, f_np(x0, y0), color="red", s=50)
+   z0 = f_np(x0, y0)
+
+ax.plot_surface(X, Y, Z, alpha=0.8)
+ax.scatter(x0, y0, z0, color="red", s=50)
+
+# Label the point (x0, y0, f(x0,y0))
+ax.text(
+    x0,
+    y0,
+    z0,
+    f"({x0:.2f}, {y0:.2f}, {z0:.2f})",
+    color="black",
+    fontsize=10,
+    ha="left",
+)
+
 
     ax.set_xlabel("x")
     ax.set_ylabel("y")
