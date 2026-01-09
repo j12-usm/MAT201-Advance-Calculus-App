@@ -74,7 +74,7 @@ if "x_min" not in st.session_state:
 if topic == "Function of Two Variables":
     st.header("📊 Function of Two Variables")
 
-     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
+    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
 
     st.caption(
         "Use standard mathematical syntax.\n\n"
