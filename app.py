@@ -147,27 +147,29 @@ if topic == "Function of Two Variables":
 # 2. Partial Derivatives
 # =================================================
 elif topic == "Partial Derivatives":
-    st.header("Partial Derivatives as Rate of Change")
+    st.header("Partial Derivatives as Rates of Change")
 
-    expr_input = st.text_input("Enter f(x, y):", "x^2 + x*y")
+    expr_input = st.text_input("Enter f(x, y):", "x**2 + x*y")
     f, error = parse_function(expr_input)
     if error:
         st.error("Invalid function syntax.")
         st.stop()
 
-    # Symbolic partial derivatives
+    # Compute partial derivatives
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
 
     st.latex(r"\frac{\partial f}{\partial x} = " + sp.latex(fx))
     st.latex(r"\frac{\partial f}{\partial y} = " + sp.latex(fy))
 
+    # -----------------------------
     # Evaluation point
+    # -----------------------------
     col1, col2 = st.columns(2)
     with col1:
-        x0 = st.number_input("x₀", value=1.0)
+        x0 = st.number_input("x₀", value=1.0, min_value=-20.0, max_value=20.0)
     with col2:
-        y0 = st.number_input("y₀", value=1.0)
+        y0 = st.number_input("y₀", value=1.0, min_value=-20.0, max_value=20.0)
 
     st.success(
         f"At ({x0}, {y0}): "
@@ -175,60 +177,45 @@ elif topic == "Partial Derivatives":
         f"∂f/∂y = {float(fy.subs({x:x0, y:y0})):.3f}"
     )
 
-    # -------------------------------------------------
-    # Numeric lambdas for partial derivatives
-    # -------------------------------------------------
-    t = np.linspace(-3, 3, 100)
+    # -----------------------------
+    # Visualization
+    # -----------------------------
+    f_np = sp.lambdify((x, y), f, "numpy")
+    fx_np = sp.lambdify((x, y), fx, "numpy")
+    fy_np = sp.lambdify((x, y), fy, "numpy")
 
-    # Fix one variable first (plane slicing)
-    fx_np = sp.lambdify(x, fx.subs(y, y0), "numpy")
-    fy_np = sp.lambdify(y, fy.subs(x, x0), "numpy")
+    t = np.linspace(-10, 10, 300)  # range for plotting
 
-    # -------------------------------------------------
-    # Graph 1: Plane y = y0 → ∂f/∂x vs x
-    # -------------------------------------------------
-    st.markdown(
-        rf"**Graph 1:** Rate of change of $f$ with respect to $x$ "
-        rf"when the plane $y = {y0}$ is fixed."
-    )
+    # Create side-by-side plots
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 
-    fig_x, ax_x = plt.subplots()
-    ax_x.plot(t, fx_np(t))
-    ax_x.set_title(r"Rate of Change $\partial f / \partial x$ (y fixed)")
-    ax_x.set_xlabel("x")
-    ax_x.set_ylabel(r"$\partial f / \partial x$")
-    st.pyplot(fig_x)
+    # --------- x-direction ---------
+    ax1.plot(t, f_np(t, y0), label=f"f(x, {y0})", color="blue")
+    ax1.plot(t, fx_np(t, y0), label=f"∂f/∂x at y={y0}", color="red", linestyle="--")
+    ax1.axvline(x0, color="black", linestyle=":", label=f"x₀ = {x0}")
+    ax1.scatter(x0, f_np(x0, y0), color="green", s=50)
+    ax1.text(x0, f_np(x0, y0), f"({x0:.2f},{f_np(x0,y0):.2f})", fontsize=9,
+             ha="left", va="bottom", color="green")
+    ax1.set_title("Rate of Change w.r.t x")
+    ax1.set_xlabel("x")
+    ax1.set_ylabel("f(x, y₀) and ∂f/∂x")
+    ax1.legend()
+    ax1.grid(True)
 
-    # -------------------------------------------------
-    # Graph 2: Plane x = x0 → ∂f/∂y vs y
-    # -------------------------------------------------
-    st.markdown(
-        rf"**Graph 2:** Rate of change of $f$ with respect to $y$ "
-        rf"when the plane $x = {x0}$ is fixed."
-    )
+    # --------- y-direction ---------
+    ax2.plot(t, f_np(x0, t), label=f"f({x0}, y)", color="blue")
+    ax2.plot(t, fy_np(x0, t), label=f"∂f/∂y at x={x0}", color="red", linestyle="--")
+    ax2.axvline(y0, color="black", linestyle=":", label=f"y₀ = {y0}")
+    ax2.scatter(y0, f_np(x0, y0), color="green", s=50)
+    ax2.text(y0, f_np(x0, y0), f"({y0:.2f},{f_np(x0,y0):.2f})", fontsize=9,
+             ha="left", va="bottom", color="green")
+    ax2.set_title("Rate of Change w.r.t y")
+    ax2.set_xlabel("y")
+    ax2.set_ylabel("f(x₀, y) and ∂f/∂y")
+    ax2.legend()
+    ax2.grid(True)
 
-    fig_y, ax_y = plt.subplots()
-    ax_y.plot(t, fy_np(t))
-    ax_y.set_title(r"Rate of Change $\partial f / \partial y$ (x fixed)")
-    ax_y.set_xlabel("y")
-    ax_y.set_ylabel(r"$\partial f / \partial y$")
-    st.pyplot(fig_y)
-
-# -------------------------------------------------
-# Graph 2: Plane x = x0 → ∂f/∂y vs y
-# -------------------------------------------------
-st.markdown(
-    rf"**Graph 2:** Rate of change of $f$ with respect to $y$ "
-    rf"when the plane $x = {x0}$ is fixed."
-)
-
-fig_y, ax_y = plt.subplots()
-ax_y.plot(t, fy_np(t))
-ax_y.set_title(r"Rate of Change $\partial f / \partial y$ (x fixed)")
-ax_y.set_xlabel("y")
-ax_y.set_ylabel(r"$\partial f / \partial y$")
-st.pyplot(fig_y)
-
+    st.pyplot(fig)
 # =================================================
 # 3. Differentials
 # =================================================
