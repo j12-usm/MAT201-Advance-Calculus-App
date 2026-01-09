@@ -189,8 +189,6 @@ if topic == "Function of Two Variables":
     st.latex(analyze_domain(f))
 
     # -----------------------------
-   # ---------------------------------
-    # -----------------------------
     # Plot
     # -----------------------------
     f_np = sp.lambdify((x, y), f, "numpy")
@@ -203,16 +201,11 @@ if topic == "Function of Two Variables":
     fig = plt.figure(figsize=(6, 5))
     ax = fig.add_subplot(projection="3d")
 
-    # Compute function value at the evaluation point
     z0 = f_np(x0, y0)
 
-    # Plot surface
     ax.plot_surface(X, Y, Z, alpha=0.8, cmap="viridis")
-
-    # Plot evaluation point
     ax.scatter(x0, y0, z0, color="red", s=50)
 
-    # Label point with automatic offset
     label_offset = (np.nanmax(Z) - np.nanmin(Z)) * 0.05
     ax.text(
         x0,
@@ -225,16 +218,11 @@ if topic == "Function of Two Variables":
         va="bottom",
     )
 
-    # -----------------------------
     # Move Z-axis to the left
-    # -----------------------------
     ax.view_init(elev=30, azim=240)
     ax.zaxis.set_label_position('left')
     ax.zaxis.set_tick_params(labelleft=True, labelright=False)
 
-    # -----------------------------
-    # Labels and axis limits
-    # -----------------------------
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("f(x,y)")
@@ -280,7 +268,6 @@ elif topic == "Partial Derivatives":
         f"∂f/∂y = {float(fy.subs({x:x0,y:y0})):.3f}"
     )
 
-    # Rate-of-change plots
     t = np.linspace(-3, 3, 100)
     f_np = sp.lambdify((x, y), f, "numpy")
 
@@ -318,7 +305,6 @@ elif topic == "Differentials":
         st.error("Invalid function.")
         st.stop()
 
-    # Partial derivatives
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
 
@@ -326,7 +312,6 @@ elif topic == "Differentials":
     st.latex(r"f_x = " + sp.latex(fx))
     st.latex(r"f_y = " + sp.latex(fy))
 
-    # Inputs
     col1, col2 = st.columns(2)
     with col1:
         x0 = st.number_input("x₀", value=1.0)
@@ -335,7 +320,6 @@ elif topic == "Differentials":
         dx = st.number_input("dx", value=0.1)
         dy = st.number_input("dy", value=0.1)
 
-    # Symbolic differential
     dx_sym, dy_sym = sp.symbols("dx dy")
     df_symbolic = fx * dx_sym + fy * dy_sym
 
@@ -343,12 +327,10 @@ elif topic == "Differentials":
     st.latex(r"df = f_x\,dx + f_y\,dy")
     st.latex(r"df = " + sp.latex(df_symbolic))
 
-    # Substitute dx, dy
     df_substituted = df_symbolic.subs({dx_sym: dx, dy_sym: dy})
     st.subheader("Substitute dx and dy")
     st.latex(r"df = " + sp.latex(df_substituted))
 
-    # Evaluate at (x0, y0)
     df_numeric = df_substituted.subs({x: x0, y: y0})
     f_np = sp.lambdify((x, y), f, "numpy")
     actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
@@ -356,11 +338,6 @@ elif topic == "Differentials":
     st.success(f"df ≈ {float(df_numeric):.5f}")
     st.info(f"Actual change Δf = {actual_change:.5f}")
     st.warning(f"Approximation error = {abs(actual_change - float(df_numeric)):.5e}")
-
-    st.info(
-        "The differential provides a linear approximation to the actual change in the function. "
-        "The approximation improves as dx and dy become smaller."
-    )
 
     st.info(
         "The differential provides a linear approximation to the actual change in the function. "
