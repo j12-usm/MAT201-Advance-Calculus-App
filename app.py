@@ -190,62 +190,59 @@ if topic == "Function of Two Variables":
 
     # -----------------------------
    # ---------------------------------
-# Plot
-# ---------------------------------
-f_np = sp.lambdify((x, y), f, "numpy")
-x_vals = np.linspace(x_min, x_max, 120)
-y_vals = np.linspace(y_min, y_max, 120)
-X, Y = np.meshgrid(x_vals, y_vals)
-Z = f_np(X, Y)
-Z = np.where(np.isfinite(Z), Z, np.nan)
+    # -----------------------------
+    # Plot
+    # -----------------------------
+    f_np = sp.lambdify((x, y), f, "numpy")
+    x_vals = np.linspace(x_min, x_max, 120)
+    y_vals = np.linspace(y_min, y_max, 120)
+    X, Y = np.meshgrid(x_vals, y_vals)
+    Z = f_np(X, Y)
+    Z = np.where(np.isfinite(Z), Z, np.nan)
 
-fig = plt.figure(figsize=(6, 5))
-ax = fig.add_subplot(projection="3d")
+    fig = plt.figure(figsize=(6, 5))
+    ax = fig.add_subplot(projection="3d")
 
-# Compute function value at the evaluation point
-z0 = f_np(x0, y0)
+    # Compute function value at the evaluation point
+    z0 = f_np(x0, y0)
 
-# Plot surface
-ax.plot_surface(X, Y, Z, alpha=0.8, cmap="viridis")
+    # Plot surface
+    ax.plot_surface(X, Y, Z, alpha=0.8, cmap="viridis")
 
-# Plot evaluation point
-ax.scatter(x0, y0, z0, color="red", s=50)
+    # Plot evaluation point
+    ax.scatter(x0, y0, z0, color="red", s=50)
 
-# Label point with automatic offset
-label_offset = (np.nanmax(Z) - np.nanmin(Z)) * 0.05
-ax.text(
-    x0,
-    y0,
-    z0 + label_offset,
-    f"({x0:.2f}, {y0:.2f}, {z0:.2f})",
-    color="black",
-    fontsize=10,
-    ha="left",
-    va="bottom",
-)
+    # Label point with automatic offset
+    label_offset = (np.nanmax(Z) - np.nanmin(Z)) * 0.05
+    ax.text(
+        x0,
+        y0,
+        z0 + label_offset,
+        f"({x0:.2f}, {y0:.2f}, {z0:.2f})",
+        color="black",
+        fontsize=10,
+        ha="left",
+        va="bottom",
+    )
 
-# -----------------------------
-# Move Z-axis to the left
-# -----------------------------
-# Rotate view so z-axis is on left
-ax.view_init(elev=30, azim=240)  # Adjust azim to rotate the scene
+    # -----------------------------
+    # Move Z-axis to the left
+    # -----------------------------
+    ax.view_init(elev=30, azim=240)
+    ax.zaxis.set_label_position('left')
+    ax.zaxis.set_tick_params(labelleft=True, labelright=False)
 
-# Set z-axis label and ticks on the left
-ax.zaxis.set_label_position('left')
-ax.zaxis.set_tick_params(labelleft=True, labelright=False)
+    # -----------------------------
+    # Labels and axis limits
+    # -----------------------------
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("f(x,y)")
+    ax.set_xlim(x_min, x_max)
+    ax.set_ylim(y_min, y_max)
 
-# -----------------------------
-# Labels and axis limits
-# -----------------------------
-ax.set_xlabel("x")
-ax.set_ylabel("y")
-ax.set_zlabel("f(x,y)")
-ax.set_xlim(x_min, x_max)
-ax.set_ylim(y_min, y_max)
-
-st.pyplot(fig)
-st.success(f"f({x0}, {y0}) = {z0:.3f}")
-
+    st.pyplot(fig)
+    st.success(f"f({x0}, {y0}) = {z0:.3f}")
 
 # =================================================
 # 2. Partial Derivatives
