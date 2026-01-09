@@ -149,16 +149,12 @@ if topic == "Function of Two Variables":
 elif topic == "Partial Derivatives":
     st.header("Partial Derivatives as Rate of Change")
 
-    # -----------------------------
-    # Input function
-    # -----------------------------
     expr_input = st.text_input("Enter f(x, y):", "x**2 + x*y")
     f, error = parse_function(expr_input)
     if error:
         st.error("Invalid function syntax.")
         st.stop()
 
-    # Compute symbolic partial derivatives
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
 
@@ -166,57 +162,38 @@ elif topic == "Partial Derivatives":
     st.latex(r"\frac{\partial f}{\partial x} = " + sp.latex(fx))
     st.latex(r"\frac{\partial f}{\partial y} = " + sp.latex(fy))
 
-    # -----------------------------
-    # Evaluation point
-    # -----------------------------
     col1, col2 = st.columns(2)
-    with col1:
-        x0 = st.number_input("x₀", value=1.0)
-    with col2:
-        y0 = st.number_input("y₀", value=1.0)
+    with col1: x0 = st.number_input("x₀", value=1.0)
+    with col2: y0 = st.number_input("y₀", value=1.0)
 
-    # Display numeric values
     fx_val = float(fx.subs({x:x0, y:y0}))
     fy_val = float(fy.subs({x:x0, y:y0}))
     st.success(f"At ({x0}, {y0}): ∂f/∂x = {fx_val:.3f}, ∂f/∂y = {fy_val:.3f}")
 
-    # -----------------------------
-    # Convert to NumPy functions
-    # -----------------------------
     f_np = sp.lambdify((x, y), f, "numpy")
     fx_np = sp.lambdify((x, y), fx, "numpy")
     fy_np = sp.lambdify((x, y), fy, "numpy")
 
-    # -----------------------------
-    # Range for plotting
-    # -----------------------------
     t = np.linspace(-5, 5, 200)
 
-    # -----------------------------
-    # Plot f(x, y) and ∂f/∂x at y=y0
-    # -----------------------------
+    # w.r.t x
     x_vals = t
-    y_fixed = np.full_like(x_vals, y0)  # shape match
+    y_fixed = np.full_like(x_vals, y0)
     fx_vals = fx_np(x_vals, y_fixed)
     f_vals_x = f_np(x_vals, y_fixed)
 
     fig1, ax1 = plt.subplots(figsize=(6,4))
     ax1.plot(x_vals, f_vals_x, label=f"f(x, {y0})", color="blue")
     ax1.plot(x_vals, fx_vals, label=f"∂f/∂x at y={y0}", color="red", linestyle="--")
-    # Removed black dotted line (axvline)
     ax1.scatter(x0, f_np(x0, y0), color="green", s=50)
     ax1.text(x0, f_np(x0, y0), f"({x0:.2f},{f_np(x0,y0):.2f})", fontsize=9,
              ha="left", va="bottom", color="green")
-    ax1.set_xlabel("x")
-    ax1.set_ylabel("f(x, y₀) and ∂f/∂x")
+    ax1.set_xlabel("x"); ax1.set_ylabel("f(x, y₀) and ∂f/∂x")
     ax1.set_title("Rate of Change w.r.t x")
-    ax1.legend()
-    ax1.grid(True)
+    ax1.legend(); ax1.grid(True)
     st.pyplot(fig1)
 
-    # -----------------------------
-    # Plot f(x, y) and ∂f/∂y at x=x0
-    # -----------------------------
+    # w.r.t y
     y_vals = t
     x_fixed = np.full_like(y_vals, x0)
     fy_vals = fy_np(x_fixed, y_vals)
@@ -225,15 +202,12 @@ elif topic == "Partial Derivatives":
     fig2, ax2 = plt.subplots(figsize=(6,4))
     ax2.plot(y_vals, f_vals_y, label=f"f({x0}, y)", color="blue")
     ax2.plot(y_vals, fy_vals, label=f"∂f/∂y at x={x0}", color="red", linestyle="--")
-    # Removed black dotted line (axvline)
     ax2.scatter(y0, f_np(x0, y0), color="green", s=50)
     ax2.text(y0, f_np(x0, y0), f"({y0:.2f},{f_np(x0,y0):.2f})", fontsize=9,
              ha="left", va="bottom", color="green")
-    ax2.set_xlabel("y")
-    ax2.set_ylabel("f(x₀, y) and ∂f/∂y")
+    ax2.set_xlabel("y"); ax2.set_ylabel("f(x₀, y) and ∂f/∂y")
     ax2.set_title("Rate of Change w.r.t y")
-    ax2.legend()
-    ax2.grid(True)
+    ax2.legend(); ax2.grid(True)
     st.pyplot(fig2)
 
 # =================================================
@@ -242,18 +216,13 @@ elif topic == "Partial Derivatives":
 elif topic == "Differentials":
     st.header("Differentials and Linear Approximation")
 
-    # -----------------------------
-    # Input function
-    # -----------------------------
     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
     f, error = parse_function(expr_input)
     if error:
         st.error("Invalid function syntax.")
         st.stop()
 
-    # -----------------------------
     # Partial derivatives
-    # -----------------------------
     fx = sp.diff(f, x)
     fy = sp.diff(f, y)
 
@@ -261,9 +230,7 @@ elif topic == "Differentials":
     st.latex(r"f_x = " + sp.latex(fx))
     st.latex(r"f_y = " + sp.latex(fy))
 
-    # -----------------------------
     # Input point and increments
-    # -----------------------------
     col1, col2 = st.columns(2)
     with col1:
         x0 = st.number_input("x₀", value=1.0)
@@ -272,49 +239,34 @@ elif topic == "Differentials":
         dx = st.number_input("dx", value=0.1)
         dy = st.number_input("dy", value=0.1)
 
-    # -----------------------------
-    # Differential df = fx dx + fy dy
-    # -----------------------------
-    df_symbolic = fx * dx + fy * dy  # Keep dx/dy as numeric for display
-    fx_val = float(fx.subs({x: x0, y: y0}))
-    fy_val = float(fy.subs({x: x0, y: y0}))
-
-    df_numeric_value = fx_val * dx + fy_val * dy  # Compute df numerically
+    # Differential df = fx*dx + fy*dy
+    fx_val = float(fx.subs({x:x0, y:y0}))
+    fy_val = float(fy.subs({x:x0, y:y0}))
+    df_numeric = fx_val*dx + fy_val*dy
 
     st.subheader("Differential df")
     st.latex(r"df = f_x dx + f_y dy")
-    st.latex(r"df \approx {:.3f} \cdot dx + {:.3f} \cdot dy".format(fx_val, fy_val))
-    st.markdown(f"Substitute dx = {dx}, dy = {dy}:  df = {fx_val}*{dx} + {fy_val}*{dy} = {df_numeric_value:.5f}")
-    st.success(f"Numeric value: df ≈ {df_numeric_value:.5f}")
+    st.latex(r"df \approx {:.3f} dx + {:.3f} dy".format(fx_val, fy_val))
+    st.markdown(f"Substitute dx={dx}, dy={dy}: df = {fx_val}*{dx} + {fy_val}*{dy} = {df_numeric:.5f}")
+    st.success(f"Numeric value: df ≈ {df_numeric:.5f}")
 
-    # -----------------------------
-    # Actual change Δf
-    # -----------------------------
-    f_np = sp.lambdify((x, y), f, "numpy")
-    actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
+    # Actual change
+    f_np = sp.lambdify((x,y), f,"numpy")
+    actual_change = f_np(x0+dx, y0+dy) - f_np(x0, y0)
     st.info(f"Actual change Δf = f(x₀+dx, y₀+dy) - f(x₀,y₀) = {actual_change:.5f}")
-    st.warning(f"Error of differential approximation = |Δf - df| = {abs(actual_change - df_numeric_value):.5e}")
+    st.warning(f"Error of differential approximation = |Δf - df| = {abs(actual_change - df_numeric):.5e}")
 
-    # -----------------------------
-    # Linear approximation (tangent plane)
-    # -----------------------------
-    L = (
-        f.subs({x: x0, y: y0})
-        + fx.subs({x: x0, y: y0}) * (x - x0)
-        + fy.subs({x: x0, y: y0}) * (y - y0)
-    )
-
+    # Linear approximation
+    L = f.subs({x:x0, y:y0}) + fx_val*(x - x0) + fy_val*(y - y0)
     st.subheader("Linear Approximation (Tangent Plane)")
     st.latex(r"L(x,y) = " + sp.latex(L))
 
-    # Step-by-step for linear approximation
-    L_at_point = f.subs({x: x0, y: y0})
-    L_increment = fx_val * dx + fy_val * dy
-    L_approx = L_at_point + L_increment
-    true_value = f_np(x0 + dx, y0 + dy)
+    L_increment = fx_val*dx + fy_val*dy
+    L_approx = f.subs({x:x0, y:y0}) + L_increment
+    true_value = f_np(x0+dx, y0+dy)
     linear_error = abs(true_value - L_approx)
 
-    st.markdown(f"L(x₀, y₀) = f({x0}, {y0}) = {L_at_point:.5f}")
+    st.markdown(f"L(x₀, y₀) = f({x0},{y0}) = {f.subs({x:x0, y:y0}):.5f}")
     st.markdown(f"Increment = f_x*dx + f_y*dy = {fx_val}*{dx} + {fy_val}*{dy} = {L_increment:.5f}")
     st.success(f"L(x₀ + dx, y₀ + dy) ≈ {L_approx:.5f}")
     st.info(f"True f(x₀ + dx, y₀ + dy) = {true_value:.5f}")
@@ -326,5 +278,4 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
-
 
