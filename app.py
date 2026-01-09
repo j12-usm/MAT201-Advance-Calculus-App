@@ -219,7 +219,7 @@ elif topic == "Differentials":
     # -----------------------------
     # Input function
     # -----------------------------
-    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
+    expr_input = st.text_input("Enter f(x, y):", "x**2 + y**2")
     f, error = parse_function(expr_input)
     if error:
         st.error("Invalid function syntax.")
@@ -253,17 +253,21 @@ elif topic == "Differentials":
     fy_val = float(fy.subs({x: x0, y: y0}))
 
     # -----------------------------
-    # Differential df
+    # Differential df = fx*dx + fy*dy
     # -----------------------------
-    df_numeric = (fx_val * dx) + (fy_val * dy)
-
     st.subheader("Differential df")
     st.latex(r"df = f_x dx + f_y dy")
-    st.latex(r"df \approx ({:.3f})dx + ({:.3f})dy".format(fx_val, fy_val))
+
+    # Show substitution explicitly
+    df_expression = fx_val * dx + fy_val * dy
     st.markdown(
-        f"Substitute dx = {dx}, dy = {dy}: df = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {df_numeric:.5f}"
+        f"Substitute f_x({x0},{y0}) = {fx_val}, f_y({x0},{y0}) = {fy_val}, "
+        f"dx = {dx}, dy = {dy}:"
     )
-    st.success(f"Numeric value: df ≈ {df_numeric:.5f}")
+    st.latex(r"df \approx ({:.3f})*({:.3f}) + ({:.3f})*({:.3f}) = {:.5f}".format(
+        fx_val, dx, fy_val, dy, df_expression
+    ))
+    st.success(f"Numeric value: df ≈ {df_expression:.5f}")
 
     # -----------------------------
     # Actual change Δf
@@ -271,10 +275,10 @@ elif topic == "Differentials":
     f_np = sp.lambdify((x, y), f, "numpy")
     actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
     st.info(
-        f"Actual change Δf = f(x₀+dx, y₀+dy) - f(x₀, y₀) "
-        f"= f({x0+dx},{y0+dy}) - f({x0},{y0}) = {actual_change:.5f}"
+        f"Actual change Δf = f(x₀+dx, y₀+dy) - f(x₀, y₀) = "
+        f"f({x0+dx},{y0+dy}) - f({x0},{y0}) = {actual_change:.5f}"
     )
-    st.warning(f"Error of differential approximation = |Δf - df| = {abs(actual_change - df_numeric):.5e}")
+    st.warning(f"Error of differential approximation = |Δf - df| = {abs(actual_change - df_expression):.5e}")
 
     # -----------------------------
     # Linear approximation (tangent plane)
@@ -283,18 +287,25 @@ elif topic == "Differentials":
 
     st.subheader("Linear Approximation (Tangent Plane)")
     st.latex(r"L(x,y) = f(x_0, y_0) + f_x(x_0, y_0) (x-x_0) + f_y(x_0, y_0) (y-y_0)")
-    st.latex(r"L(x,y) = {:.5f} + ({:.3f}) (x - {:.3f}) + ({:.3f}) (y - {:.3f})".format(
-        float(f.subs({x: x0, y: y0})), fx_val, x0, fy_val, y0
-    ))
 
-    # Step-by-step evaluation for L(x0+dx, y0+dy)
+    # Show substitution step
+    f_at_point = float(f.subs({x: x0, y: y0}))
+    st.latex(
+        r"L(x,y) = {:.5f} + ({:.3f})*(x-{:.3f}) + ({:.3f})*(y-{:.3f})".format(
+            f_at_point, fx_val, x0, fy_val, y0
+        )
+    )
+
+    # Evaluate linear approximation at (x0+dx, y0+dy)
     L_increment = (fx_val * dx) + (fy_val * dy)
-    L_approx = float(f.subs({x: x0, y: y0})) + L_increment
+    L_approx = f_at_point + L_increment
     true_value = f_np(x0 + dx, y0 + dy)
     linear_error = abs(true_value - L_approx)
 
-    st.markdown(f"L(x₀, y₀) = f({x0},{y0}) = {f.subs({x:x0, y:y0}):.5f}")
-    st.markdown(f"Increment = f_x*dx + f_y*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {L_increment:.5f}")
+    st.markdown(
+        f"L(x₀, y₀) = f({x0},{y0}) = {f_at_point:.5f}\n"
+        f"Increment = f_x*dx + f_y*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {L_increment:.5f}"
+    )
     st.success(f"L(x₀ + dx, y₀ + dy) ≈ {L_approx:.5f}")
     st.info(f"True f(x₀ + dx, y₀ + dy) = {true_value:.5f}")
     st.warning(f"Linear approximation error = {linear_error:.5e}")
@@ -305,5 +316,6 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
+
 
 
