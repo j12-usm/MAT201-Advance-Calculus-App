@@ -327,5 +327,4 @@ elif topic == "Differentials":
         "- Smaller dx, dy → better approximation"
     )
 
-    )
 
