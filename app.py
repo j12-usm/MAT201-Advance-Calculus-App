@@ -235,35 +235,8 @@ elif topic == "Partial Derivatives":
     ax2.legend()
     ax2.grid(True)
     st.pyplot(fig2)
+
 # =================================================
-# 3. Differentials
-# =================================================
-elif topic == "Differentials":
-    st.header("Differentials and Linear Approximation")
-
-    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
-    f, error = parse_function(expr_input)
-    if error:
-        st.error("Invalid function syntax.")
-        st.stop()
-
-    # Partial derivatives
-    fx = sp.diff(f, x)
-    fy = sp.diff(f, y)
-
-    st.latex(r"f_x = " + sp.latex(fx))
-    st.latex(r"f_y = " + sp.latex(fy))
-
-    # Point and increments
-    col1, col2 = st.columns(2)
-    with col1:
-        x0 = st.number_input("x₀", value=1.0)
-        y0 = st.number_input("y₀", value=1.0)
-    with col2:
-        dx = st.number_input("dx", value=0.1)
-        dy = st.number_input("dy", value=0.1)
-
-   # =================================================
 # 3. Differentials
 # =================================================
 elif topic == "Differentials":
@@ -302,22 +275,17 @@ elif topic == "Differentials":
     # -----------------------------
     # Differential df = fx dx + fy dy
     # -----------------------------
-    dx_sym, dy_sym = sp.symbols("dx dy")
-    df_symbolic = fx * dx_sym + fy * dy_sym
-
-    st.subheader("Differential (df)")
-    st.latex(r"df = f_x dx + f_y dy")
-    st.latex(r"df = " + sp.latex(df_symbolic))
-
-    # Substitute dx and dy (still showing as ax dx + by dy)
-    df_with_values = df_symbolic.subs({dx_sym: dx, dy_sym: dy})
-    df_numeric = df_with_values.subs({x: x0, y: y0})
-    
-    # Extract coefficients for display in ax dx + by dy form
+    df_symbolic = fx * dx + fy * dy  # Keep dx/dy as numeric for display
     fx_val = float(fx.subs({x: x0, y: y0}))
     fy_val = float(fy.subs({x: x0, y: y0}))
-    st.latex(r"df \approx " + f"{fx_val:.3f}·dx + {fy_val:.3f}·dy")
-    st.success(f"Numeric value: df ≈ {float(df_numeric):.5f}")
+
+    df_numeric_value = fx_val * dx + fy_val * dy  # Compute df numerically
+
+    st.subheader("Differential df")
+    st.latex(r"df = f_x dx + f_y dy")
+    st.latex(r"df \approx {:.3f} \cdot dx + {:.3f} \cdot dy".format(fx_val, fy_val))
+    st.markdown(f"Substitute dx = {dx}, dy = {dy}:  df = {fx_val}*{dx} + {fy_val}*{dy} = {df_numeric_value:.5f}")
+    st.success(f"Numeric value: df ≈ {df_numeric_value:.5f}")
 
     # -----------------------------
     # Actual change Δf
@@ -325,7 +293,7 @@ elif topic == "Differentials":
     f_np = sp.lambdify((x, y), f, "numpy")
     actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
     st.info(f"Actual change Δf = f(x₀+dx, y₀+dy) - f(x₀,y₀) = {actual_change:.5f}")
-    st.warning(f"Error of differential approximation = |Δf - df| = {abs(actual_change - float(df_numeric)):.5e}")
+    st.warning(f"Error of differential approximation = |Δf - df| = {abs(actual_change - df_numeric_value):.5e}")
 
     # -----------------------------
     # Linear approximation (tangent plane)
@@ -335,15 +303,20 @@ elif topic == "Differentials":
         + fx.subs({x: x0, y: y0}) * (x - x0)
         + fy.subs({x: x0, y: y0}) * (y - y0)
     )
+
     st.subheader("Linear Approximation (Tangent Plane)")
     st.latex(r"L(x,y) = " + sp.latex(L))
 
-    # Evaluate linear approximation at (x0+dx, y0+dy)
-    L_approx = L.subs({x: x0 + dx, y: y0 + dy})
+    # Step-by-step for linear approximation
+    L_at_point = f.subs({x: x0, y: y0})
+    L_increment = fx_val * dx + fy_val * dy
+    L_approx = L_at_point + L_increment
     true_value = f_np(x0 + dx, y0 + dy)
-    linear_error = abs(true_value - float(L_approx))
+    linear_error = abs(true_value - L_approx)
 
-    st.success(f"L(x₀ + dx, y₀ + dy) ≈ {float(L_approx):.5f}")
+    st.markdown(f"L(x₀, y₀) = f({x0}, {y0}) = {L_at_point:.5f}")
+    st.markdown(f"Increment = f_x*dx + f_y*dy = {fx_val}*{dx} + {fy_val}*{dy} = {L_increment:.5f}")
+    st.success(f"L(x₀ + dx, y₀ + dy) ≈ {L_approx:.5f}")
     st.info(f"True f(x₀ + dx, y₀ + dy) = {true_value:.5f}")
     st.warning(f"Linear approximation error = {linear_error:.5e}")
 
@@ -352,5 +325,7 @@ elif topic == "Differentials":
         "- Differential df gives the linear change: df = f_x dx + f_y dy\n"
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
+    )
+
     )
 
