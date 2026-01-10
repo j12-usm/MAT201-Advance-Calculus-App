@@ -77,11 +77,11 @@ if topic == "Function of Two Variables":
     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
 
     st.caption(
-        "Use standard mathematical syntax.\n\n"
-        "Examples:\n\n"
-        "• sin(x*y)\n\n"
-        "• sqrt(x^2 + y^2)\n\n"
-        "• exp(x+y)\n\n"
+        "Use standard mathematical syntax.\n"
+        "Examples:\n"
+        "• sin(x*y)\n"
+        "• sqrt(x^2 + y^2)\n"
+        "• exp(x+y)\n"
         "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
     )
     
