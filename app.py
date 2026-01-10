@@ -95,7 +95,7 @@ st.caption("Use `asin(x)` for sin⁻¹(x), and `cos(x)^2` for cos²(x).")
 
     
 
-    f, error = parse_function(expr_input)
+f, error = parse_function(expr_input)
 
     if error:
         st.error("❌ Invalid function syntax.")
