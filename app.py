@@ -78,7 +78,7 @@ if topic == "Function of Two Variables":
 
     st.caption("Use standard mathematical syntax.")
 
-    st.markdown("**Examples:**")
+    st.caption("**Examples:**")
 
     col1, col2, col3 = st.columns([1.2, 1.8, 1.2])
 
@@ -91,7 +91,7 @@ if topic == "Function of Two Variables":
     with col3:
         st.markdown("<span style='font-size:15px'>• <code>exp(x + y)</code></span>", unsafe_allow_html=True)
 
-    st.caption("Use `asin(x)` for sin⁻¹(x), and `cos(x)^2` for cos²(x).")
+    st.caption("Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x).")
 
 
     f, error = parse_function(expr_input)
