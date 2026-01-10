@@ -80,20 +80,19 @@ if topic == "Function of Two Variables":
 
     st.markdown("**Examples:**")
 
-    col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns([1.2, 1.8, 1.2])
 
     with col1:
-        st.code("sin(x*y)", language="text")
+        st.caption("• `sin(x*y)`")
 
     with col2:
-        st.code("sqrt(x^2 + y^2)", language="text")
+        st.caption("• `sqrt(x^2 + y^2)`")
 
     with col3:
-        st.code("exp(x + y)", language="text")
+        st.caption("• `exp(x + y)`")
 
     st.caption("Use `asin(x)` for sin⁻¹(x), and `cos(x)^2` for cos²(x).")
 
-    
 
     f, error = parse_function(expr_input)
 
