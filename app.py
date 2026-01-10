@@ -79,8 +79,8 @@ if topic == "Function of Two Variables":
     st.caption(
         "Use standard mathematical syntax.\n\n"
         "Examples:\n\n"
-        "• sin(x*y)\n"
-        "• sqrt(x^2 + y^2)\n"
+        "• sin(x*y)\n\n"
+        "• sqrt(x^2 + y^2)\n\n"
         "• exp(x+y)\n\n"
         "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
     )
@@ -233,8 +233,8 @@ elif topic == "Partial Derivatives":
     st.caption(
         "Use standard mathematical syntax.\n\n"
         "Examples:\n\n"
-        "• sin(x*y)\n"
-        "• sqrt(x^2 + y^2)\n"
+        "• sin(x*y)\n\n"
+        "• sqrt(x^2 + y^2)\n\n"
         "• exp(x+y)\n\n"
         "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
     )
@@ -314,8 +314,8 @@ elif topic == "Differentials":
     st.caption(
         "Use standard mathematical syntax.\n\n"
         "Examples:\n\n"
-        "• sin(x*y)\n"
-        "• sqrt(x^2 + y^2)\n"
+        "• sin(x*y)\n\n"
+        "• sqrt(x^2 + y^2)\n\n"
         "• exp(x+y)\n\n"
         "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
     )
