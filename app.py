@@ -75,22 +75,15 @@ if topic == "Function of Two Variables":
     st.header("📊 Function of Two Variables")
 
     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
-
     st.caption("Use standard mathematical syntax.")
-
     st.caption("**Examples:**")
-
     col1, col2, col3 = st.columns([1.2, 1.8, 1.2])
-
     with col1:
         st.markdown("<span style='font-size:15px'>• <code>sin(x*y)</code></span>", unsafe_allow_html=True)
-
     with col2:
         st.markdown("<span style='font-size:15px'>• <code>sqrt(x^2 + y^2)</code></span>", unsafe_allow_html=True)
-
     with col3:
         st.markdown("<span style='font-size:15px'>• <code>exp(x + y)</code></span>", unsafe_allow_html=True)
-
     st.caption("Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x).")
 
 
@@ -237,16 +230,16 @@ elif topic == "Partial Derivatives":
     st.header("Partial Derivatives as Rate of Change")
 
     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
-
-    st.caption(
-        "Use standard mathematical syntax.\n\n"
-        "Examples:\n\n"
-        "• sin(x*y)\n\n"
-        "• sqrt(x^2 + y^2)\n\n"
-        "• exp(x+y)\n\n"
-        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
-    )
-
+    st.caption("Use standard mathematical syntax.")
+    st.caption("**Examples:**")
+    col1, col2, col3 = st.columns([1.2, 1.8, 1.2])
+    with col1:
+        st.markdown("<span style='font-size:15px'>• <code>sin(x*y)</code></span>", unsafe_allow_html=True)
+    with col2:
+        st.markdown("<span style='font-size:15px'>• <code>sqrt(x^2 + y^2)</code></span>", unsafe_allow_html=True)
+    with col3:
+        st.markdown("<span style='font-size:15px'>• <code>exp(x + y)</code></span>", unsafe_allow_html=True)
+    st.caption("Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x).")
 
     f, error = parse_function(expr_input)
     if error:
@@ -318,16 +311,16 @@ elif topic == "Differentials":
     # Input function
     # -----------------------------
     expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
-
-    st.caption(
-        "Use standard mathematical syntax.\n\n"
-        "Examples:\n\n"
-        "• sin(x*y)\n\n"
-        "• sqrt(x^2 + y^2)\n\n"
-        "• exp(x+y)\n\n"
-        "Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x)."
-    )
-
+    st.caption("Use standard mathematical syntax.")
+    st.caption("**Examples:**")
+    col1, col2, col3 = st.columns([1.2, 1.8, 1.2])
+    with col1:
+        st.markdown("<span style='font-size:15px'>• <code>sin(x*y)</code></span>", unsafe_allow_html=True)
+    with col2:
+        st.markdown("<span style='font-size:15px'>• <code>sqrt(x^2 + y^2)</code></span>", unsafe_allow_html=True)
+    with col3:
+        st.markdown("<span style='font-size:15px'>• <code>exp(x + y)</code></span>", unsafe_allow_html=True)
+    st.caption("Use asin(x) for sin⁻¹(x), and cos(x)^2 for cos²(x).")
 
     f, error = parse_function(expr_input)
     if error:
