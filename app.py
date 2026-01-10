@@ -74,28 +74,28 @@ if "x_min" not in st.session_state:
 if topic == "Function of Two Variables":
     st.header("📊 Function of Two Variables")
 
-expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
+    expr_input = st.text_input("Enter f(x, y):", "x^2 + y^2")
 
-st.caption("Use standard mathematical syntax.")
+    st.caption("Use standard mathematical syntax.")
 
-st.markdown("**Examples:**")
+    st.markdown("**Examples:**")
 
-col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
 
-with col1:
-    st.code("sin(x*y)", language="text")
+    with col1:
+        st.code("sin(x*y)", language="text")
 
-with col2:
-    st.code("sqrt(x^2 + y^2)", language="text")
+    with col2:
+        st.code("sqrt(x^2 + y^2)", language="text")
 
-with col3:
-    st.code("exp(x + y)", language="text")
+    with col3:
+        st.code("exp(x + y)", language="text")
 
-st.caption("Use `asin(x)` for sin⁻¹(x), and `cos(x)^2` for cos²(x).")
+    st.caption("Use `asin(x)` for sin⁻¹(x), and `cos(x)^2` for cos²(x).")
 
     
 
-f, error = parse_function(expr_input)
+    f, error = parse_function(expr_input)
 
     if error:
         st.error("❌ Invalid function syntax.")
