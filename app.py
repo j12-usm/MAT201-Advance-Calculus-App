@@ -23,16 +23,22 @@ def log10(x):
 def parse_function(expr_input):
     try:
         expr_input = expr_input.replace("^", "**")
+
+        # Protect ln before SymPy eats it
+        expr_input = re.sub(r"\bln\s*\(", "LN(", expr_input)
+
         f = sp.sympify(expr_input, locals={
             "x": x, "y": y,
             "sin": sp.sin, "cos": sp.cos, "tan": sp.tan,
             "asin": sp.asin, "acos": sp.acos, "atan": sp.atan,
             "exp": sp.exp, "sqrt": sp.sqrt,
-            "ln": sp.log,          # natural log
-            "log": log10,          # base-10 log
+            "log": sp.log,
+            "LN": LN,
             "e": sp.E,
         })
+
         return f, None
+
     except Exception as e:
         return None, str(e)
 
@@ -54,37 +60,28 @@ def latex_with_mixed_ln_log(expr, original_input):
     return sp.latex(expr, fold_short_frac=True, symbol_names={}, 
                     mul_symbol="dot", 
                     printer=_log_to_latex)
+def restore_ln(expr):
+    return expr.replace(
+        lambda e: isinstance(e, LN),
+        lambda e: sp.log(e.args[0])
+    )
 
 # -----------------------------
 # LaTeX display helpers
 # -----------------------------
 from sympy.printing.latex import LatexPrinter
 
-def latex_with_mixed_ln_log(expr, original_input):
-    expr = sp.simplify(expr)
+class CustomLatexPrinter(LatexPrinter):
+    def _print_log(self, expr):
+        arg = expr.args[0]
+        return r"\log\!\left(%s\right)" % self._print(arg)
 
-    user_used_ln = "ln(" in original_input
-    user_used_log = "log(" in original_input
+    def _print_LN(self, expr):
+        arg = expr.args[0]
+        return r"\ln\!\left(%s\right)" % self._print(arg)
 
-    class CustomLatexPrinter(LatexPrinter):
-        def _print_log(self, expr):
-            arg = expr.args[0]
 
-            # Explicit base-10 log
-            if len(expr.args) == 2 and expr.args[1] == 10:
-                return r"\log_{10}\!\left(%s\right)" % self._print(arg)
-
-            # User typed ln(x)
-            if user_used_ln:
-                return r"\ln\!\left(%s\right)" % self._print(arg)
-
-            # User typed log(x)
-            if user_used_log:
-                return r"\log\!\left(%s\right)" % self._print(arg)
-
-            # fallback
-            return r"\ln\!\left(%s\right)" % self._print(arg)
-
+def latex_with_mixed_ln_log(expr):
     return CustomLatexPrinter().doprint(expr)
 
 # -----------------------------
