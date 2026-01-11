@@ -14,83 +14,83 @@ st.title("📐 Multivariable Calculus Learning App")
 x, y = sp.symbols("x y", real=True)
 
 # -----------------------------
+# Custom LN function class
+# -----------------------------
+class LN(sp.Function):
+    """Custom natural logarithm function to distinguish from base-10 log"""
+    
+    @classmethod
+    def eval(cls, arg):
+        return None
+    
+    def _eval_derivative(self, arg):
+        return 1/arg
+    
+    def _eval_evalf(self, prec):
+        return sp.log(self.args[0])._eval_evalf(prec)
+
+# -----------------------------
+# Custom LaTeX Printer
+# -----------------------------
+from sympy.printing.latex import LatexPrinter
+
+class CustomLatexPrinter(LatexPrinter):
+    def _print_Mul(self, expr):
+        """Override multiplication to show implicit multiplication"""
+        coeff, rest = expr.as_coeff_Mul()
+        
+        if coeff == 1 and all(isinstance(arg, sp.Symbol) or 
+                              (isinstance(arg, sp.Pow) and isinstance(arg.base, sp.Symbol))
+                              for arg in rest.args):
+            return ''.join(self._print(arg) for arg in rest.args)
+        
+        return super()._print_Mul(expr)
+    
+    def _print_log(self, expr):
+        """Print base-10 logarithm"""
+        arg = expr.args[0]
+        if len(expr.args) == 2 and expr.args[1] == 10:
+            return r"\log_{10}\!\left(%s\right)" % self._print(arg)
+        return r"\log\!\left(%s\right)" % self._print(arg)
+    
+    def _print_LN(self, expr):
+        """Print natural logarithm as ln"""
+        arg = expr.args[0]
+        return r"\ln\!\left(%s\right)" % self._print(arg)
+
+def latex_with_mixed_ln_log(expr):
+    """Convert expression to LaTeX with proper ln/log distinction"""
+    return CustomLatexPrinter().doprint(expr)
+
+# -----------------------------
 # Safe function parser
 # -----------------------------
-
-def log10(x):
-    return sp.log(x, 10)
-
 def parse_function(expr_input):
     try:
         expr_input = expr_input.replace("^", "**")
-
-        # Protect ln before SymPy eats it
         expr_input = re.sub(r"\bln\s*\(", "LN(", expr_input)
-
+        
         f = sp.sympify(expr_input, locals={
             "x": x, "y": y,
             "sin": sp.sin, "cos": sp.cos, "tan": sp.tan,
             "asin": sp.asin, "acos": sp.acos, "atan": sp.atan,
             "exp": sp.exp, "sqrt": sp.sqrt,
-            "log": sp.log,
+            "log": lambda arg: sp.log(arg, 10),
             "LN": LN,
             "e": sp.E,
         })
-
+        
         return f, None
-
+    
     except Exception as e:
         return None, str(e)
 
-def latex_with_mixed_ln_log(expr, original_input):
-
-    def _log_to_latex(e):
-        if isinstance(e, sp.log):
-            arg = e.args[0]
-
-            # log(x, 10) → base-10
-            if len(e.args) == 2 and e.args[1] == 10:
-                return r"\log_{10}\!\left(" + sp.latex(arg) + r"\right)"
-
-            # log(x) → natural log
-            return r"\ln\!\left(" + sp.latex(arg) + r"\right)"
-
-        return sp.latex(e)
-
-    return sp.latex(expr, fold_short_frac=True, symbol_names={}, 
-                    mul_symbol="dot", 
-                    printer=_log_to_latex)
-def restore_ln(expr):
-    return expr.replace(
-        lambda e: isinstance(e, LN),
-        lambda e: sp.log(e.args[0])
-    )
-
 # -----------------------------
-# LaTeX display helpers
+# Convert LN to sp.log for numerical evaluation
 # -----------------------------
-from sympy.printing.latex import LatexPrinter
-
-class CustomLatexPrinter(LatexPrinter):
-    def _print_log(self, expr):
-        arg = expr.args[0]
-        return r"\log\!\left(%s\right)" % self._print(arg)
-
-    def _print_LN(self, expr):
-        arg = expr.args[0]
-        return r"\ln\!\left(%s\right)" % self._print(arg)
-
-
-def latex_with_mixed_ln_log(expr):
-    return CustomLatexPrinter().doprint(expr)
-
-# -----------------------------
-# Custom display (show ln instead of log)
-# -----------------------------
-def latex_with_ln(expr):
-    latex_str = sp.latex(expr)
-    latex_str = latex_str.replace(r"\log", r"\ln")
-    return latex_str
+def convert_for_numpy(expr):
+    """Convert LN to sp.log for lambdify"""
+    return expr.replace(LN, lambda arg: sp.log(arg.args[0]))
 
 # -----------------------------
 # Domain analyzer
@@ -101,6 +101,8 @@ def analyze_domain(expr):
         if power.exp == sp.Rational(1, 2):
             conditions.append(sp.latex(power.base) + r" \ge 0")
     for arg in expr.atoms(sp.log):
+        conditions.append(sp.latex(arg.args[0]) + r" > 0")
+    for arg in expr.atoms(LN):
         conditions.append(sp.latex(arg.args[0]) + r" > 0")
     denom = sp.denom(expr)
     if denom != 1:
@@ -157,7 +159,7 @@ if topic == "Function of Two Variables":
         st.error("❌ Invalid function syntax.")
         st.stop()
 
-    st.latex(rf"f(x,y) = {latex_with_mixed_ln_log(f, expr_input)}")
+    st.latex(rf"f(x,y) = {latex_with_mixed_ln_log(f)}")
 
     # Evaluation point
     col1, col2 = st.columns(2)
@@ -216,7 +218,8 @@ if topic == "Function of Two Variables":
     # -----------------------------
     # Interactive 3D Plot (Plotly)
     # -----------------------------
-    f_np = sp.lambdify((x, y), f, "numpy")
+    f_eval = convert_for_numpy(f)
+    f_np = sp.lambdify((x, y), f_eval, "numpy")
     X, Y = np.meshgrid(
         np.linspace(x_min, x_max, 120),
         np.linspace(y_min, y_max, 120)
@@ -237,8 +240,8 @@ if topic == "Function of Two Variables":
     opacity=0.85,
     colorbar=dict(
         title="f(x,y)",
-        x=1.15,        # move colorbar right
-        len=0.75,      # slightly shorter
+        x=1.15,
+        len=0.75,
         thickness=18
     )
 ))
@@ -318,29 +321,32 @@ elif topic == "Partial Derivatives":
     fy = sp.diff(f, y)
 
     st.subheader("Symbolic Partial Derivatives")
-    st.latex(r"\frac{\partial f}{\partial x} = " + latex_with_mixed_ln_log(fx, expr_input))
-    st.latex(r"\frac{\partial f}{\partial y} = " + latex_with_mixed_ln_log(fy, expr_input))
+    st.latex(r"\frac{\partial f}{\partial x} = " + latex_with_mixed_ln_log(fx))
+    st.latex(r"\frac{\partial f}{\partial y} = " + latex_with_mixed_ln_log(fy))
 
 
     col1, col2 = st.columns(2)
     with col1: x0 = st.number_input("x₀", value=1.0)
     with col2: y0 = st.number_input("y₀", value=1.0)
 
-    fx_val = float(fx.subs({x:x0, y:y0}))
-    fy_val = float(fy.subs({x:x0, y:y0}))
+    fx_eval = convert_for_numpy(fx)
+    fy_eval = convert_for_numpy(fy)
+    fx_val = float(fx_eval.subs({x:x0, y:y0}))
+    fy_val = float(fy_eval.subs({x:x0, y:y0}))
     st.success(f"At ({x0}, {y0}): ∂f/∂x = {fx_val:.3f}, ∂f/∂y = {fy_val:.3f}")
 
+    f_eval = convert_for_numpy(f)
     if uses_x and uses_y:
-        f_np = sp.lambdify((x, y), f, "numpy")
+        f_np = sp.lambdify((x, y), f_eval, "numpy")
     elif uses_x:
-        f_np = sp.lambdify(x, f, "numpy")
+        f_np = sp.lambdify(x, f_eval, "numpy")
     elif uses_y:
-        f_np = sp.lambdify(y, f, "numpy")
+        f_np = sp.lambdify(y, f_eval, "numpy")
 
     if uses_x:
-        fx_np = sp.lambdify((x, y), fx, "numpy") if uses_y else sp.lambdify(x, fx, "numpy")
+        fx_np = sp.lambdify((x, y), fx_eval, "numpy") if uses_y else sp.lambdify(x, fx_eval, "numpy")
     if uses_y:
-        fy_np = sp.lambdify((x, y), fy, "numpy") if uses_x else sp.lambdify(y, fy, "numpy")
+        fy_np = sp.lambdify((x, y), fy_eval, "numpy") if uses_x else sp.lambdify(y, fy_eval, "numpy")
 
     t = np.linspace(-5, 5, 200)
 
@@ -447,8 +453,8 @@ elif topic == "Differentials":
     fy = sp.diff(f, y)
 
     st.subheader("Symbolic Partial Derivatives")
-    st.latex(r"fx = " + latex_with_mixed_ln_log(fx, expr_input))
-    st.latex(r"fy = " + latex_with_mixed_ln_log(fy, expr_input))
+    st.latex(r"fx = " + latex_with_mixed_ln_log(fx))
+    st.latex(r"fy = " + latex_with_mixed_ln_log(fy))
 
     # -----------------------------
     # Input point and increments
@@ -464,8 +470,10 @@ elif topic == "Differentials":
     # -----------------------------
     # Evaluate fx and fy at point
     # -----------------------------
-    fx_sub = fx.subs({x: x0, y: y0})
-    fy_sub = fy.subs({x: x0, y: y0})
+    fx_eval = convert_for_numpy(fx)
+    fy_eval = convert_for_numpy(fy)
+    fx_sub = fx_eval.subs({x: x0, y: y0})
+    fy_sub = fy_eval.subs({x: x0, y: y0})
     fx_val = float(fx_sub)
     fy_val = float(fy_sub)
 
@@ -491,7 +499,8 @@ elif topic == "Differentials":
     # -----------------------------
     # Actual change Δf
     # -----------------------------
-    f_np = sp.lambdify((x, y), f, "numpy")
+    f_eval = convert_for_numpy(f)
+    f_np = sp.lambdify((x, y), f_eval, "numpy")
     actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
     st.info(
         f"Actual change Δf = f(x₀+dx, y₀+dy) - f(x₀, y₀) = "
@@ -516,7 +525,7 @@ elif topic == "Differentials":
     st.latex(r"L(x,y) = f(x₀, y₀) + fx(x₀,y₀) (x-x₀) + fy(x₀,y₀) (y-y₀)")
 
     # Show substitution in L
-    f_at_point = float(f.subs({x: x0, y: y0}))
+    f_at_point = float(f_eval.subs({x: x0, y: y0}))
     L_increment = df_numeric
     L_approx = f_at_point + L_increment
     true_value = f_np(x0 + dx, y0 + dy)
@@ -542,8 +551,3 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
-
-
-
-
-
