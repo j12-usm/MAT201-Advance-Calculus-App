@@ -487,25 +487,28 @@ elif topic == "Differentials":
         dy = st.number_input("dy", value=0.1)
 
     # -----------------------------
-    # Step 1: Evaluate fx and fy at (x0,y0) with full substitution
+    # Step 1: Evaluate fx and fy at (x0,y0) in full 4-step style
     # -----------------------------
-    st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$")
+    st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$ in full substitution format")
 
     # fx
-    fx_symbolic = sp.latex(fx)
-    fx_sub = sp.latex(fx.subs({x: x0, y: y0}))  # substitution form
-    fx_val = float(fx.subs({x: x0, y: y0}))     # numeric value
+    fx_symbolic = sp.latex(fx)  # symbolic fx
+    fx_subs_a_b = fx.subs({x: x0, y: y0})  # plug in numbers
+    fx_numeric = float(fx_subs_a_b)
+
     st.latex(
-        rf"f_x(x_0,y_0) = f_x({x0},{y0}) = {fx_sub} \approx {fx_val}"
+        rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {sp.latex(fx_symbolic).replace('x','{0}').replace('y','{1}')} = {sp.latex(fx_subs_a_b)} \approx {fx_numeric}"
     )
 
     # fy
-    fy_symbolic = sp.latex(fy)
-    fy_sub = sp.latex(fy.subs({x: x0, y: y0}))
-    fy_val = float(fy.subs({x: x0, y: y0}))
+    fy_symbolic = sp.latex(fy)  # symbolic fy
+    fy_subs_a_b = fy.subs({x: x0, y: y0})  # plug in numbers
+    fy_numeric = float(fy_subs_a_b)
+
     st.latex(
-        rf"f_y(x_0,y_0) = f_y({x0},{y0}) = {fy_sub} \approx {fy_val}"
+        rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {sp.latex(fy_symbolic).replace('x','{0}').replace('y','{1}')} = {sp.latex(fy_subs_a_b)} \approx {fy_numeric}"
     )
+
 
     # -----------------------------
     # Step 2: Multiply by dx and dy
