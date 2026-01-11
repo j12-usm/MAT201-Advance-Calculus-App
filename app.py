@@ -563,12 +563,12 @@ elif topic == "Differentials":
     L_approx = f_at_point + L_increment
     st.latex(rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_at_point} + {L_increment:.5f} = {L_approx:.5f}")
 
-    # True f(x0+dx, y0+dy) with substitution
+    # f(x0+dx, y0+dy) with substitution
     true_x = x0 + dx
     true_y = y0 + dy
     f_true_formula_str = sp.latex(f).replace('x', f'({true_x})').replace('y', f'({true_y})')
     true_value = f_np(true_x, true_y)
-    st.latex(rf"True\ f(x_0 + dx, y_0 + dy) = f({true_x},{true_y}) = {f_true_formula_str} = {true_value:.5f}")
+    st.latex(rf"f({true_x},{true_y}) = {f_true_formula_str} = {true_value:.5f}")
 
     # Linear approximation error
     linear_error = abs(true_value - L_approx)
@@ -577,6 +577,7 @@ elif topic == "Differentials":
     else:
         linear_error_sci = "0"
     st.warning(f"Linear approximation error ≈ {linear_error_sci}")
+
 
 
 
