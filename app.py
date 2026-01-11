@@ -445,6 +445,14 @@ elif topic == "Partial Derivatives":
 elif topic == "Differentials":
     st.header("Differentials and Linear Approximation")
 
+    # Helper function for 4sf with trailing zeros
+    def format_4sf(val):
+        if val == 0:
+            return "0.000"
+        digits_before = int(np.floor(np.log10(abs(val)))) + 1
+        decimal_places = max(0, 4 - digits_before)
+        return f"{val:.{decimal_places}f}"
+
     # -----------------------------
     # Input function
     # -----------------------------
@@ -487,90 +495,129 @@ elif topic == "Differentials":
         dy = st.number_input("dy", value=0.1)
 
     # -----------------------------
-    # Step 1: Evaluate fx and fy at (x0,y0) with bracketed substitution
+    # Step 1: Evaluate fx and fy at (x0,y0)
     # -----------------------------
     st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$")
 
     # fx
     fx_sub = fx.subs({x: x0, y: y0})
     fx_numeric = float(fx_sub)
-    fx_formula = sp.latex(fx).replace('x', f'({x0})').replace('y', f'({y0})')
-    st.latex(rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {fx_formula} = {format(fx_numeric,'.4g')}")
+    fx_numeric_str = format_4sf(fx_numeric)
+    fx_formula = sp.latex(fx)
+    fx_sub_formula = fx_formula.replace('x', f'({x0})').replace('y', f'({y0})')
+    st.latex(
+        rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {fx_sub_formula} = {fx_numeric_str}"
+    )
 
     # fy
     fy_sub = fy.subs({x: x0, y: y0})
     fy_numeric = float(fy_sub)
-    fy_formula = sp.latex(fy).replace('x', f'({x0})').replace('y', f'({y0})')
-    st.latex(rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {fy_formula} = {format(fy_numeric,'.4g')}")
+    fy_numeric_str = format_4sf(fy_numeric)
+    fy_formula = sp.latex(fy)
+    fy_sub_formula = fy_formula.replace('x', f'({x0})').replace('y', f'({y0})')
+    st.latex(
+        rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {fy_sub_formula} = {fy_numeric_str}"
+    )
 
     # -----------------------------
-    # Step 2: Differential df and actual change Δf
+    # Step 2: Differential df and Δf
     # -----------------------------
-    st.markdown("### Step 2: Differential df and f(x₀+dx, y₀+dy)")
+    st.markdown("### Step 2: Differential df = f_x*dx + f_y*dy and change in f")
 
-    # df calculation
+    # Actual change Δf
+    f_x0_y0 = f.subs({x: x0, y: y0})
+    f_x0_y0_str = format_4sf(float(f_x0_y0))
+    actual_x = x0 + dx
+    actual_y = y0 + dy
+    f_actual_x_y = f.subs({x: actual_x, y: actual_y})
+    f_actual_str = format_4sf(float(f_actual_x_y))
+
+    # Show f(x0, y0)
+    f_x0_y0_formula = sp.latex(f).replace('x', f'({x0})').replace('y', f'({y0})')
+    st.latex(
+        rf"f(x_0, y_0) = f({x0},{y0}) = {f_x0_y0_formula} = {f_x0_y0_str}"
+    )
+
+    # Show f(x0+dx, y0+dy)
+    f_actual_formula = sp.latex(f).replace('x', f'({actual_x})').replace('y', f'({actual_y})')
+    st.latex(
+        rf"f(x_0+dx, y_0+dy) = f({actual_x},{actual_y}) = {f_actual_formula} = {f_actual_str}"
+    )
+
+    # Differential increment with detailed calculation
     df_x = fx_numeric * dx
     df_y = fy_numeric * dy
     df_numeric = df_x + df_y
 
-    # Format numbers to 4 sf with trailing zeros
-    df_x_str = f"{df_x:.4f}"
-    df_y_str = f"{df_y:.4f}"
-    df_numeric_str = f"{df_numeric:.4f}"
+    df_x_str = format_4sf(df_x)
+    df_y_str = format_4sf(df_y)
+    df_numeric_str = format_4sf(df_numeric)
 
     st.latex(
-        rf"df = f_x*dx + f_y*dy = ({fx_numeric})*({dx}) + ({fy_numeric})*({dy}) = {df_x_str} + {df_y_str} = {df_numeric_str}"
+        rf"df = f_x*dx + f_y*dy = ({fx_numeric_str})*({dx}) + ({fy_numeric_str})*({dy}) = {df_x_str} + {df_y_str} = {df_numeric_str}"
     )
 
-    # f(x0,y0)
-    f_x0_y0 = float(f.subs({x: x0, y: y0}))
-    f_x0_y0_str = f"{f_x0_y0:.4f}"
-
-    # f(x0+dx, y0+dy)
-    f_actual_x_y = float(f.subs({x: x0+dx, y: y0+dy}))
-    f_actual_str = f"{f_actual_x_y:.4f}"
-
-    # Display f calculations
-    f_formula_x0 = sp.latex(f).replace('x', f'({x0})').replace('y', f'({y0})')
-    f_formula_actual = sp.latex(f).replace('x', f'({x0+dx})').replace('y', f'({y0+dy})')
-
-    st.latex(rf"f(x_0, y_0) = f({x0},{y0}) = {f_formula_x0} = {f_x0_y0_str}")
+    # Δf calculation
+    delta_f = float(f_actual_x_y - f_x0_y0)
+    delta_f_str = format_4sf(delta_f)
     st.latex(
-        rf"f(x_0+dx, y_0+dy) = f({x0+dx},{y0+dy}) = {f_formula_actual} = {f_actual_str}"
+        rf"\Delta f = f(x_0+dx, y_0+dy) - f(x_0, y_0) = {f_actual_str} - {f_x0_y0_str} = {delta_f_str}"
     )
 
-    # Linear approximation error using Step 2 values only
-    linear_error_val = f_actual_x_y - df_numeric  # f(x0+dx,y0+dy) - Increment
-    linear_error_str = f"{linear_error_val:.4f}"
-
-    st.latex(
-        rf"\text{{Linear Approximation Error}} = f(x_0+dx, y_0+dy) - Increment = {f_actual_str} - {df_numeric_str} = {linear_error_str}"
-    )
+    # Error
+    error_value = abs(delta_f - df_numeric)
+    if error_value != 0:
+        error_sci = f"{error_value/10**int(np.floor(np.log10(error_value))):.3g}*10^{int(np.floor(np.log10(error_value)))}"
+    else:
+        error_sci = "0"
+    st.warning(f"Error of differential approximation = |Δf - df| ≈ {error_sci}")
 
     # -----------------------------
-    # Linear approximation (tangent plane)
+    # Linear approximation (separate)
     # -----------------------------
     st.markdown("### Linear Approximation (Tangent Plane)")
 
-    # Show general formula
-    st.latex(r"L(x, y) = f(x_0, y_0) + f_x(x_0, y_0)*(x-x_0) + f_y(x_0, y_0)*(y-y_0)")
+    # General L(x,y) formula
+    st.latex(r"L(x, y) = f(x_0, y_0) + f_x(x_0, y_0) \cdot (x - x_0) + f_y(x_0, y_0) \cdot (y - y_0)")
 
-    # Show increment from Step 2
+    # Numeric evaluation of f at (x0, y0) and f at (x0+dx, y0+dy)
+    f_np = sp.lambdify((x, y), f, "numpy")
+    f_x0_y0_val = f_np(x0, y0)
+    f_actual_val = f_np(x0 + dx, y0 + dy)
+
+    # Increment calculation for linear approximation
+    L_increment = fx_numeric*dx + fy_numeric*dy
+
+    # Format numbers for 4sf with trailing zeros
+    f_x0_y0_str = format_4sf(f_x0_y0_val)
+    df_x_str = format_4sf(fx_numeric*dx)
+    df_y_str = format_4sf(fy_numeric*dy)
+    L_increment_str = format_4sf(L_increment)
+    L_approx_val = f_x0_y0_val + L_increment
+    L_approx_str = format_4sf(L_approx_val)
+    f_actual_str = format_4sf(f_actual_val)
+
+    # Show increment calculation
     st.latex(
-        rf"Increment = f_x*dx + f_y*dy = ({fx_numeric})*({dx}) + ({fy_numeric})*({dy}) = {df_x_str} + {df_y_str} = {df_numeric_str}"
+        rf"Increment = f_x*dx + f_y*dy = ({fx_numeric_str})*({dx}) + ({fy_numeric_str})*({dy}) = {df_x_str} + {df_y_str} = {L_increment_str}"
     )
 
-    # Linear approximation value at (x0+dx,y0+dy)
-    L_approx_val = f_x0_y0 + df_numeric
-    L_approx_str = f"{L_approx_val:.4f}"
+    # Linear approximation at (x0+dx, y0+dy)
     st.latex(
-        rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_x0_y0_str} + {df_numeric_str} = {L_approx_str}"
+        rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_x0_y0_str} + {L_increment_str} = {L_approx_str}"
+    )
+
+    # Linear approximation error directly from f and L
+    linear_error = f_actual_val - L_approx_val
+    linear_error_str = format_4sf(linear_error)
+    st.latex(
+        rf"\text{{Linear Approximation Error}} = f(x_0+dx, y_0+dy) - L(x_0+dx, y_0+dy) = {f_actual_str} - {L_approx_str} = {linear_error_str}"
     )
 
     st.info(
         "Summary:\n"
         "- Differential df shows the linear change: df = f_x*dx + f_y*dy\n"
-        "- Linear approximation uses f(x0,y0) + Increment\n"
-        "- Linear approximation error = f(x0+dx, y0+dy) - Increment\n"
+        "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
+    
