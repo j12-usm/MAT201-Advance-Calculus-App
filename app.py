@@ -464,7 +464,7 @@ elif topic == "Differentials":
     if error:
         st.error("Invalid function syntax.")
         st.stop()
-        
+
     # -----------------------------
     # Partial derivatives
     # -----------------------------
@@ -487,28 +487,22 @@ elif topic == "Differentials":
         dy = st.number_input("dy", value=0.1)
 
     # -----------------------------
-    # Step 1: Evaluate fx and fy at (x0,y0) in full 4-step substitution style
+    # Step 1: Evaluate fx and fy at (x0,y0) in proper 4-step display
     # -----------------------------
     st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$ in full substitution format")
 
     # fx
-    fx_symbolic = sp.latex(fx)  # symbolic fx
-    fx_substitute = fx.subs({x: x0, y: y0})  # substitution into (x0, y0)
-    fx_numeric = float(fx_substitute)
-    fx_substitute_latex = sp.latex(fx_symbolic).replace('x', str(x0)).replace('y', str(y0))  # formula with numbers
-
+    fx_substitute = fx.subs({x: x0, y: y0})      # substitution
+    fx_numeric = float(fx_substitute)            # numeric value
     st.latex(
-        rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {fx_substitute_latex} = {sp.latex(fx_substitute)} \approx {fx_numeric}"
+        rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {sp.latex(fx)}\big|_{{x={x0},y={y0}}} = {sp.latex(fx_substitute)} \approx {fx_numeric}"
     )
 
     # fy
-    fy_symbolic = sp.latex(fy)  # symbolic fy
     fy_substitute = fy.subs({x: x0, y: y0})
     fy_numeric = float(fy_substitute)
-    fy_substitute_latex = sp.latex(fy_symbolic).replace('x', str(x0)).replace('y', str(y0))
-
     st.latex(
-        rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {fy_substitute_latex} = {sp.latex(fy_substitute)} \approx {fy_numeric}"
+        rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {sp.latex(fy)}\big|_{{x={x0},y={y0}}} = {sp.latex(fy_substitute)} \approx {fy_numeric}"
     )
 
     # -----------------------------
