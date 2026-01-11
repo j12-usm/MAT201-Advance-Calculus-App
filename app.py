@@ -522,7 +522,7 @@ elif topic == "Differentials":
     # -----------------------------
     # Step 2: Differential df and Δf
     # -----------------------------
-    st.markdown("### Step 2: Differential df = $(f_x)$*dx + $(f_y)$*dy and change in f")
+    st.markdown("### Step 2: Differential df = $f_x$*dx + $f_y$*dy and change in f")
 
     # Actual change Δf
     f_x0_y0 = f.subs({x: x0, y: y0})
