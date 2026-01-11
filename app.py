@@ -544,38 +544,40 @@ elif topic == "Differentials":
         error_sci = "0"
     st.warning(f"Error of differential approximation = |Δf - df| ≈ {error_sci}")
 
+        # -----------------------------
+    # Step 3: Linear approximation (tangent plane) with explicit substitution like Step 1
     # -----------------------------
-    # Step 3: Linear approximation (tangent plane) with bracketed substitution
-    # -----------------------------
-    st.markdown("### Step 3: Linear approximation (tangent plane) L(x₀+dx, y₀+dy) with explicit bracketed substitution")
+    st.markdown("### Step 3: Linear approximation (tangent plane)")
 
-    # f(x0, y0)
+    # f(x0, y0) with substitution
+    f_formula_str = sp.latex(f).replace('x', f'({x0})').replace('y', f'({y0})')
     f_at_point = float(f.subs({x: x0, y: y0}))
+    st.latex(rf"f(x_0, y_0) = f({x0},{y0}) = {f_formula_str} = {f_at_point}")
 
-    # Increment = fx*dx + fy*dy
+    # Increment = fx*dx + fy*dy with bracketed substitution
     L_increment_formula = f"({fx_numeric})*({dx}) + ({fy_numeric})*({dy})"
-    L_increment = df_numeric  # same as df_numeric
+    L_increment = df_numeric
+    st.latex(rf"Increment = f_x*dx + f_y*dy = {L_increment_formula} = {L_increment:.5f}")
 
     # Linear approximation
     L_approx = f_at_point + L_increment
-
-    # True value
-    f_np = sp.lambdify((x, y), f, "numpy")
-    true_value = f_np(x0 + dx, y0 + dy)
-
-    # Display
-    st.latex(rf"f(x_0, y_0) = f({x0},{y0}) = {f_at_point}")
-    st.latex(rf"Increment = f_x*dx + f_y*dy = {L_increment_formula} = {L_increment:.5f}")
     st.latex(rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_at_point} + {L_increment:.5f} = {L_approx:.5f}")
-    st.latex(rf"True\ f(x_0 + dx, y_0 + dy) = f({x0+dx},{y0+dy}) = {true_value:.5f}")
 
-    # Optional: Linear approximation error
+    # True f(x0+dx, y0+dy) with substitution
+    true_x = x0 + dx
+    true_y = y0 + dy
+    f_true_formula_str = sp.latex(f).replace('x', f'({true_x})').replace('y', f'({true_y})')
+    true_value = f_np(true_x, true_y)
+    st.latex(rf"True\ f(x_0 + dx, y_0 + dy) = f({true_x},{true_y}) = {f_true_formula_str} = {true_value:.5f}")
+
+    # Linear approximation error
     linear_error = abs(true_value - L_approx)
     if linear_error != 0:
         linear_error_sci = f"{linear_error/10**int(np.floor(np.log10(linear_error))):.3f}*10^{int(np.floor(np.log10(linear_error)))}"
     else:
         linear_error_sci = "0"
     st.warning(f"Linear approximation error ≈ {linear_error_sci}")
+
 
 
     st.info(
