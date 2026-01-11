@@ -607,8 +607,10 @@ elif topic == "Differentials":
         rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_x0_y0_str} + {L_increment_str} = {L_approx_str}"
     )
 
-    # Linear approximation error computed directly from displayed values
-    linear_error_val = float(f_actual_str) - float(L_approx_str)
+    # -----------------------------
+    # Linear approximation error (display like Step 2)
+    # -----------------------------
+    linear_error_val = float(f_actual_str) - float(L_approx_str)  # compute using displayed values
     linear_error_str = format_4sf(linear_error_val)
 
     st.latex(
