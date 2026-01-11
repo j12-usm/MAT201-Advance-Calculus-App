@@ -27,6 +27,17 @@ def parse_function(expr_input):
         return f, None
     except Exception as e:
         return None, str(e)
+
+def latex_with_user_log(expr, original_input):
+    latex_str = sp.latex(expr)
+
+    if "ln(" in original_input and "log(" not in original_input:
+        # User prefers ln
+        latex_str = latex_str.replace(r"\log", r"\ln")
+
+    # If user typed log(...), keep \log as-is
+    return latex_str
+
 # -----------------------------
 # Custom display (show ln instead of log)
 # -----------------------------
@@ -100,7 +111,7 @@ if topic == "Function of Two Variables":
         st.error("❌ Invalid function syntax.")
         st.stop()
 
-    st.latex(rf"f(x,y) = {latex_with_ln(f)}")
+    st.latex(rf"f(x,y) = {latex_with_user_log(f, expr_input)}")
 
     # Evaluation point
     col1, col2 = st.columns(2)
@@ -257,8 +268,8 @@ elif topic == "Partial Derivatives":
     fy = sp.diff(f, y)
 
     st.subheader("Symbolic Partial Derivatives")
-    st.latex(r"\frac{\partial f}{\partial x} = " + latex_with_ln(fx))
-    st.latex(r"\frac{\partial f}{\partial y} = " + latex_with_ln(fy))
+    st.latex(r"\frac{\partial f}{\partial x} = " + latex_with_user_log(fx, expr_input))
+    st.latex(r"\frac{\partial f}{\partial y} = " + latex_with_user_log(fy, expr_input))
 
     col1, col2 = st.columns(2)
     with col1: x0 = st.number_input("x₀", value=1.0)
@@ -341,9 +352,9 @@ elif topic == "Differentials":
     fy = sp.diff(f, y)
 
     st.subheader("Symbolic Partial Derivatives")
-    st.latex(r"fx = " + latex_with_ln(fx))
-    st.latex(r"fy = " + latex_with_ln(fy))
-
+    st.latex(r"\frac{\partial f}{\partial x} = " + latex_with_user_log(fx, expr_input))
+    st.latex(r"\frac{\partial f}{\partial y} = " + latex_with_user_log(fy, expr_input))
+    
     # -----------------------------
     # Input point and increments
     # -----------------------------
