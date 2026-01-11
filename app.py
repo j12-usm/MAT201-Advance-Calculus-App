@@ -600,13 +600,12 @@ elif topic == "Differentials":
         rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_x0_y0_str} + {L_increment_str} = {L_approx_str}"
     )
 
-    # Linear approximation error
-    linear_error = abs(float(f_actual_x_y) - L_approx)
-    if linear_error != 0:
-        linear_error_sci = f"{linear_error/10**int(np.floor(np.log10(linear_error))):.3g}*10^{int(np.floor(np.log10(linear_error)))}"
-    else:
-        linear_error_sci = "0"
-    st.warning(f"Linear approximation error ≈ {linear_error_sci}")
+    # Linear approximation error shown as f(x0+dx,y0+dy) - L(x0+dx,y0+dy)
+    linear_error = float(f_actual_x_y) - L_approx
+    linear_error_str = format_4sf(linear_error)
+    st.latex(
+        rf"\text{{Linear Approximation Error}} = f(x_0+dx, y_0+dy) - L(x_0+dx, y_0+dy) = {f_actual_str} - {L_approx_str} = {linear_error_str}"
+    )
 
     st.info(
         "Summary:\n"
