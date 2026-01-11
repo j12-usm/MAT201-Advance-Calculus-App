@@ -494,12 +494,8 @@ elif topic == "Differentials":
     # fx
     fx_sub = fx.subs({x: x0, y: y0})
     fx_numeric = float(fx_sub)
-
-    # Create bracketed substitution formula string
     fx_formula = sp.latex(fx)
-    # Replace x and y with brackets for substitution
     fx_sub_formula = fx_formula.replace('x', f'({x0})').replace('y', f'({y0})')
-
     st.latex(
         rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {fx_sub_formula} = {fx_numeric}"
     )
@@ -509,11 +505,10 @@ elif topic == "Differentials":
     fy_numeric = float(fy_sub)
     fy_formula = sp.latex(fy)
     fy_sub_formula = fy_formula.replace('x', f'({x0})').replace('y', f'({y0})')
-
     st.latex(
         rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {fy_sub_formula} = {fy_numeric}"
     )
-    
+
     # -----------------------------
     # Step 2: Differential df with bracketed substitution and actual change Δf
     # -----------------------------
@@ -534,16 +529,15 @@ elif topic == "Differentials":
     # Formula string for display
     f_actual_formula_str = sp.latex(f).replace('x', f'({actual_x})').replace('y', f'({actual_y})')
     f_x0_y0_formula_str = sp.latex(f).replace('x', f'({x0})').replace('y', f'({y0})')
-
     st.latex(
         rf"\Delta f = f(x_0+dx, y_0+dy) - f(x_0, y_0) = "
         rf"f({actual_x},{actual_y}) - f({x0},{y0}) = "
         rf"{f_actual_formula_str} - {f_x0_y0_formula_str} = {f_actual_x_y - f_x0_y0:.5f}"
     )
 
-
     # Error in scientific notation
-    error_value = abs(actual_change - df_numeric)
+    delta_f = f_actual_x_y - f_x0_y0
+    error_value = abs(delta_f - df_numeric)
     if error_value != 0:
         error_sci = f"{error_value/10**int(np.floor(np.log10(error_value))):.3f}*10^{int(np.floor(np.log10(error_value)))}"
     else:
@@ -570,11 +564,9 @@ elif topic == "Differentials":
     st.latex(rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_at_point} + {L_increment:.5f} = {L_approx:.5f}")
 
     # f(x0+dx, y0+dy) with substitution
-    true_x = x0 + dx
-    true_y = y0 + dy
-    f_true_formula_str = sp.latex(f).replace('x', f'({true_x})').replace('y', f'({true_y})')
-    true_value = f_np(true_x, true_y)
-    st.latex(rf"f({true_x},{true_y}) = {f_true_formula_str} = {true_value:.5f}")
+    f_true_formula_str = sp.latex(f).replace('x', f'({actual_x})').replace('y', f'({actual_y})')
+    true_value = f_np(actual_x, actual_y)
+    st.latex(rf"f({actual_x},{actual_y}) = {f_true_formula_str} = {true_value:.5f}")
 
     # Linear approximation error
     linear_error = abs(true_value - L_approx)
@@ -584,13 +576,11 @@ elif topic == "Differentials":
         linear_error_sci = "0"
     st.warning(f"Linear approximation error ≈ {linear_error_sci}")
 
-
-
-
     st.info(
         "Summary:\n"
         "- Differential df shows the linear change: df = f_x*dx + f_y*dy\n"
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
+
 
