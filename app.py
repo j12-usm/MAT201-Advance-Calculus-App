@@ -55,6 +55,9 @@ def latex_with_mixed_ln_log(expr, original_input):
                     mul_symbol="dot", 
                     printer=_log_to_latex)
 
+vars_used = f.free_symbols
+uses_x = x in vars_used
+uses_y = y in vars_used
 
 # -----------------------------
 # LaTeX display helpers
@@ -330,9 +333,17 @@ elif topic == "Partial Derivatives":
     fy_val = float(fy.subs({x:x0, y:y0}))
     st.success(f"At ({x0}, {y0}): ∂f/∂x = {fx_val:.3f}, ∂f/∂y = {fy_val:.3f}")
 
-    f_np = sp.lambdify((x, y), f, "numpy")
-    fx_np = sp.lambdify((x, y), fx, "numpy")
-    fy_np = sp.lambdify((x, y), fy, "numpy")
+    if uses_x and uses_y:
+        f_np = sp.lambdify((x, y), f, "numpy")
+    elif uses_x:
+        f_np = sp.lambdify(x, f, "numpy")
+    elif uses_y:
+        f_np = sp.lambdify(y, f, "numpy")
+
+    if uses_x:
+        fx_np = sp.lambdify((x, y), fx, "numpy") if uses_y else sp.lambdify(x, fx, "numpy")
+    if uses_y:
+        fy_np = sp.lambdify((x, y), fy, "numpy") if uses_x else sp.lambdify(y, fy, "numpy")
 
     t = np.linspace(-5, 5, 200)
 
