@@ -524,12 +524,6 @@ elif topic == "Differentials":
     # -----------------------------
     st.markdown("### Step 2: Differential df = f_x*dx + f_y*dy and change in f")
 
-    # Differential
-    df_numeric = fx_numeric*dx + fy_numeric*dy
-    df_numeric_str = format_4sf(df_numeric)
-    df_formula = f"({fx_numeric_str})*({dx}) + ({fy_numeric_str})*({dy})"
-    st.latex(rf"df = f_x*dx + f_y*dy = {df_formula} = {df_numeric_str}")
-
     # Actual change Δf
     f_x0_y0 = f.subs({x: x0, y: y0})
     f_x0_y0_str = format_4sf(float(f_x0_y0))
@@ -548,6 +542,19 @@ elif topic == "Differentials":
     f_actual_formula = sp.latex(f).replace('x', f'({actual_x})').replace('y', f'({actual_y})')
     st.latex(
         rf"f(x_0+dx, y_0+dy) = f({actual_x},{actual_y}) = {f_actual_formula} = {f_actual_str}"
+    )
+
+    # Differential increment with detailed calculation
+    df_x = fx_numeric * dx
+    df_y = fy_numeric * dy
+    df_numeric = df_x + df_y
+
+    df_x_str = format_4sf(df_x)
+    df_y_str = format_4sf(df_y)
+    df_numeric_str = format_4sf(df_numeric)
+
+    st.latex(
+        rf"df = f_x*dx + f_y*dy = ({fx_numeric_str})*({dx}) + ({fy_numeric_str})*({dy}) = {df_x_str} + {df_y_str} = {df_numeric_str}"
     )
 
     # Δf calculation
@@ -573,15 +580,11 @@ elif topic == "Differentials":
     # General L(x,y) formula
     st.latex(r"L(x, y) = f(x_0, y_0) + f_x(x_0, y_0) \cdot (x - x_0) + f_y(x_0, y_0) \cdot (y - y_0)")
 
-    # Increment = df
-    L_increment = df_numeric
-    L_increment_str = format_4sf(L_increment)
-
-    # Linear approximation at (x0+dx, y0+dy)
-    L_approx = float(f_x0_y0) + L_increment
+    # Linear approximation at (x0+dx, y0+dy) using increment
+    L_increment_str = df_numeric_str
+    L_approx = float(f_x0_y0) + df_numeric
     L_approx_str = format_4sf(L_approx)
 
-    # Show L(x0+dx,y0+dy)
     st.latex(
         rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_x0_y0_str} + {L_increment_str} = {L_approx_str}"
     )
@@ -600,3 +603,4 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
+
