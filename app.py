@@ -364,7 +364,7 @@ elif topic == "Partial Derivatives":
         ax1.set_title("Rate of Change w.r.t x")
         ax1.legend(); ax1.grid(True)
         st.pyplot(fig1)
-    else
+    else:
         st.info("ℹ️ No x-direction graph (function does not depend on x).")
     
     # w.r.t y
@@ -384,7 +384,7 @@ elif topic == "Partial Derivatives":
         ax2.set_title("Rate of Change w.r.t y")
         ax2.legend(); ax2.grid(True)
         st.pyplot(fig2)
-    else
+    else:
         st.info("ℹ️ No y-direction graph (function does not depend on y).")
 
 
