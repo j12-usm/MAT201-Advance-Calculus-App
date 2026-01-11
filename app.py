@@ -494,19 +494,21 @@ elif topic == "Differentials":
     # fx
     fx_sub = fx.subs({x: x0, y: y0})
     fx_numeric = float(fx_sub)
+    fx_numeric_4sf = float(f"{fx_numeric:.4g}")
     fx_formula = sp.latex(fx)
     fx_sub_formula = fx_formula.replace('x', f'({x0})').replace('y', f'({y0})')
     st.latex(
-        rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {fx_sub_formula} = {fx_numeric}"
+        rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {fx_sub_formula} = {fx_numeric_4sf}"
     )
 
     # fy
     fy_sub = fy.subs({x: x0, y: y0})
     fy_numeric = float(fy_sub)
+    fy_numeric_4sf = float(f"{fy_numeric:.4g}")
     fy_formula = sp.latex(fy)
     fy_sub_formula = fy_formula.replace('x', f'({x0})').replace('y', f'({y0})')
     st.latex(
-        rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {fy_sub_formula} = {fy_numeric}"
+        rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {fy_sub_formula} = {fy_numeric_4sf}"
     )
 
     # -----------------------------
@@ -515,39 +517,42 @@ elif topic == "Differentials":
     st.markdown("### Step 2: Differential df = f_x*dx + f_y*dy and actual change in f")
 
     # Differential
-    df_formula = f"({fx_numeric})*({dx}) + ({fy_numeric})*({dy})"
-    df_numeric = fx_numeric*dx + fy_numeric*dy
-    st.latex(rf"df = f_x*dx + f_y*dy = {df_formula} = {df_numeric:.5f}")
-    st.success(f"Numeric value: df ≈ {df_numeric:.5f}")
+    df_numeric = fx_numeric_4sf*dx + fy_numeric_4sf*dy
+    df_numeric_4sf = float(f"{df_numeric:.4g}")
+    df_formula = f"({fx_numeric_4sf})*({dx}) + ({fy_numeric_4sf})*({dy})"
+    st.latex(rf"df = f_x*dx + f_y*dy = {df_formula} = {df_numeric_4sf}")
 
     # Actual change Δf with substitution like Step 1
     f_x0_y0 = f.subs({x: x0, y: y0})
+    f_x0_y0_numeric_4sf = float(f"{float(f_x0_y0):.4g}")
     actual_x = x0 + dx
     actual_y = y0 + dy
     f_actual_x_y = f.subs({x: actual_x, y: actual_y})
+    f_actual_numeric_4sf = float(f"{float(f_actual_x_y):.4g}")
 
     # Show f(x0, y0)
     f_x0_y0_formula = sp.latex(f).replace('x', f'({x0})').replace('y', f'({y0})')
     st.latex(
-        rf"f(x_0, y_0) = f({x0},{y0}) = {f_x0_y0_formula} = {float(f_x0_y0):.5f}"
+        rf"f(x_0, y_0) = f({x0},{y0}) = {f_x0_y0_formula} = {f_x0_y0_numeric_4sf}"
     )
 
     # Show f(x0+dx, y0+dy)
     f_actual_formula = sp.latex(f).replace('x', f'({actual_x})').replace('y', f'({actual_y})')
     st.latex(
-        rf"f(x_0+dx, y_0+dy) = f({actual_x},{actual_y}) = {f_actual_formula} = {float(f_actual_x_y):.5f}"
+        rf"f(x_0+dx, y_0+dy) = f({actual_x},{actual_y}) = {f_actual_formula} = {f_actual_numeric_4sf}"
     )
 
     # Δf calculation
-    delta_f = float(f_actual_x_y - f_x0_y0)
+    delta_f = f_actual_numeric_4sf - f_x0_y0_numeric_4sf
+    delta_f_4sf = float(f"{delta_f:.4g}")
     st.latex(
-        rf"\Delta f = f(x_0+dx, y_0+dy) - f(x_0, y_0) = {float(f_actual_x_y):.5f} - {float(f_x0_y0):.5f} = {delta_f:.5f}"
+        rf"\Delta f = f(x_0+dx, y_0+dy) - f(x_0, y_0) = {f_actual_numeric_4sf} - {f_x0_y0_numeric_4sf} = {delta_f_4sf}"
     )
 
     # Error
-    error_value = abs(delta_f - df_numeric)
+    error_value = abs(delta_f_4sf - df_numeric_4sf)
     if error_value != 0:
-        error_sci = f"{error_value/10**int(np.floor(np.log10(error_value))):.3f}*10^{int(np.floor(np.log10(error_value)))}"
+        error_sci = f"{error_value/10**int(np.floor(np.log10(error_value))):.3g}*10^{int(np.floor(np.log10(error_value)))}"
     else:
         error_sci = "0"
     st.warning(f"Error of differential approximation = |Δf - df| ≈ {error_sci}")
@@ -557,23 +562,24 @@ elif topic == "Differentials":
     # -----------------------------
     st.markdown("### Step 3: Linear approximation (tangent plane)")
 
-    L_increment = df_numeric
-    L_approx = float(f_x0_y0) + L_increment
+    L_increment = df_numeric_4sf
+    L_approx = f_x0_y0_numeric_4sf + L_increment
+    L_approx_4sf = float(f"{L_approx:.4g}")
 
     # Show increment
     st.latex(
-        rf"Increment = f_x*dx + f_y*dy = ({fx_numeric})*({dx}) + ({fy_numeric})*({dy}) = {L_increment:.5f}"
+        rf"Increment = f_x*dx + f_y*dy = ({fx_numeric_4sf})*({dx}) + ({fy_numeric_4sf})*({dy}) = {L_increment:.4g}"
     )
 
     # Show L(x0+dx,y0+dy)
     st.latex(
-        rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {float(f_x0_y0):.5f} + {L_increment:.5f} = {L_approx:.5f}"
+        rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_x0_y0_numeric_4sf} + {L_increment:.4g} = {L_approx_4sf}"
     )
 
     # Linear approximation error
-    linear_error = abs(float(f_actual_x_y) - L_approx)
+    linear_error = abs(f_actual_numeric_4sf - L_approx_4sf)
     if linear_error != 0:
-        linear_error_sci = f"{linear_error/10**int(np.floor(np.log10(linear_error))):.3f}*10^{int(np.floor(np.log10(linear_error)))}"
+        linear_error_sci = f"{linear_error/10**int(np.floor(np.log10(linear_error))):.3g}*10^{int(np.floor(np.log10(linear_error)))}"
     else:
         linear_error_sci = "0"
     st.warning(f"Linear approximation error ≈ {linear_error_sci}")
