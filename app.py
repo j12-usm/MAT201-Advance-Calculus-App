@@ -476,8 +476,8 @@ elif topic == "Differentials":
     fy = sp.diff(f, y)
 
     st.subheader("Symbolic Partial Derivatives")
-    st.latex(r"fx = " + latex_with_mixed_ln_log(fx))
-    st.latex(r"fy = " + latex_with_mixed_ln_log(fy))
+    st.latex(r"f_x = " + latex_with_mixed_ln_log(fx))
+    st.latex(r"f_y = " + latex_with_mixed_ln_log(fy))
 
     # -----------------------------
     # Input point and increments
@@ -493,29 +493,28 @@ elif topic == "Differentials":
     # -----------------------------
     # Evaluate fx and fy at point
     # -----------------------------
-    fx_eval = convert_for_numpy(fx)
-    fy_eval = convert_for_numpy(fy)
-    fx_sub = fx_eval.subs({x: x0, y: y0})
-    fy_sub = fy_eval.subs({x: x0, y: y0})
-    fx_val = float(fx_sub)
-    fy_val = float(fy_sub)
-
-    st.subheader("Differential df")
-    st.latex(r"df = fx*dx + fy*dy")
+    fx_val = float(fx.subs({x: x0, y: y0}))
+    fy_val = float(fy.subs({x: x0, y: y0}))
 
     # -----------------------------
-    # Step 1: Show fx(x0,y0) and fy(x0,y0)
+    # Step 1: Show fx(x0,y0) and fy(x0,y0) in full format
     # -----------------------------
     st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$")
+
+    # fx display
+    fx_sub = fx.subs({x: x0, y: y0})
     st.latex(
-        rf"f_x(x_0,y_0) = {sp.latex(fx)}\Big|_{{({x0},{y0})}} = {sp.latex(fx_sub)} \approx {fx_val}"
+        rf"f_x(x_0,y_0) = f_x({x0},{y0}) = {sp.latex(fx_sub)} \approx {fx_val}"
     )
+
+    # fy display
+    fy_sub = fy.subs({x: x0, y: y0})
     st.latex(
-        rf"f_y(x_0,y_0) = {sp.latex(fy)}\Big|_{{({x0},{y0})}} = {sp.latex(fy_sub)} \approx {fy_val}"
+        rf"f_y(x_0,y_0) = f_y({x0},{y0}) = {sp.latex(fy_sub)} \approx {fy_val}"
     )
 
     # -----------------------------
-    # Step 2: Multiply by dx and dy with substitution
+    # Step 2: Multiply by dx and dy
     # -----------------------------
     df_x = fx_val * dx
     df_y = fy_val * dy
@@ -530,8 +529,7 @@ elif topic == "Differentials":
     # -----------------------------
     # Actual change Δf
     # -----------------------------
-    f_eval = convert_for_numpy(f)
-    f_np = sp.lambdify((x, y), f_eval, "numpy")
+    f_np = sp.lambdify((x, y), f, "numpy")
     actual_change = f_np(x0 + dx, y0 + dy) - f_np(x0, y0)
     st.info(
         f"Actual change Δf = f(x₀+dx, y₀+dy) - f(x₀, y₀) = "
@@ -544,29 +542,24 @@ elif topic == "Differentials":
         error_sci = f"{error_value/10**int(np.floor(np.log10(error_value))):.3f}*10^{int(np.floor(np.log10(error_value)))}"
     else:
         error_sci = "0"
-
     st.warning(f"Error of differential approximation = |Δf - df| ≈ {error_sci}")
 
     # -----------------------------
     # Linear approximation (tangent plane)
     # -----------------------------
-    L = f.subs({x: x0, y: y0}) + fx_val*(x - x0) + fy_val*(y - y0)
-
-    st.subheader("Linear Approximation (Tangent Plane)")
-    st.latex(r"L(x,y) = f(x₀, y₀) + fx(x₀,y₀) (x-x₀) + fy(x₀,y₀) (y-y₀)")
-
-    # Show substitution in L
-    f_at_point = float(f_eval.subs({x: x0, y: y0}))
+    f_at_point = float(f.subs({x: x0, y: y0}))
     L_increment = df_numeric
     L_approx = f_at_point + L_increment
     true_value = f_np(x0 + dx, y0 + dy)
     linear_error = abs(true_value - L_approx)
 
-    # Linear error in *10^a format
     if linear_error != 0:
         linear_error_sci = f"{linear_error/10**int(np.floor(np.log10(linear_error))):.3f}*10^{int(np.floor(np.log10(linear_error)))}"
     else:
         linear_error_sci = "0"
+
+    st.subheader("Linear Approximation (Tangent Plane)")
+    st.latex(r"L(x,y) = f(x₀, y₀) + f_x(x₀,y₀)(x-x₀) + f_y(x₀,y₀)(y-y₀)")
 
     st.markdown(f"f({x0},{y0}) = {f_at_point:.5f}")
     st.markdown(
@@ -578,8 +571,7 @@ elif topic == "Differentials":
 
     st.info(
         "Summary:\n"
-        "- Differential df shows the linear change: df = fx*dx + fy*dy\n"
+        "- Differential df shows the linear change: df = f_x*dx + f_y*dy\n"
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
-
