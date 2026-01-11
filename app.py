@@ -30,6 +30,22 @@ class LN(sp.Function):
         return sp.log(self.args[0])._eval_evalf(prec)
 
 # -----------------------------
+# Custom log10 function class
+# -----------------------------
+class Log10(sp.Function):
+    """Custom base-10 logarithm function"""
+    
+    @classmethod
+    def eval(cls, arg):
+        return None
+    
+    def _eval_derivative(self, arg):
+        return 1/(arg * sp.log(10))
+    
+    def _eval_evalf(self, prec):
+        return sp.log(self.args[0], 10)._eval_evalf(prec)
+
+# -----------------------------
 # Custom LaTeX Printer
 # -----------------------------
 from sympy.printing.latex import LatexPrinter
@@ -46,17 +62,15 @@ class CustomLatexPrinter(LatexPrinter):
         
         return super()._print_Mul(expr)
     
-    def _print_log(self, expr):
-        """Print base-10 logarithm"""
-        arg = expr.args[0]
-        if len(expr.args) == 2 and expr.args[1] == 10:
-            return r"\log_{10}\!\left(%s\right)" % self._print(arg)
-        return r"\log\!\left(%s\right)" % self._print(arg)
-    
     def _print_LN(self, expr):
         """Print natural logarithm as ln"""
         arg = expr.args[0]
         return r"\ln\!\left(%s\right)" % self._print(arg)
+    
+    def _print_Log10(self, expr):
+        """Print base-10 logarithm as log"""
+        arg = expr.args[0]
+        return r"\log_{10}\!\left(%s\right)" % self._print(arg)
 
 def latex_with_mixed_ln_log(expr):
     """Convert expression to LaTeX with proper ln/log distinction"""
@@ -75,7 +89,7 @@ def parse_function(expr_input):
             "sin": sp.sin, "cos": sp.cos, "tan": sp.tan,
             "asin": sp.asin, "acos": sp.acos, "atan": sp.atan,
             "exp": sp.exp, "sqrt": sp.sqrt,
-            "log": lambda arg: sp.log(arg, 10),
+            "log": Log10,
             "LN": LN,
             "e": sp.E,
         })
@@ -86,11 +100,13 @@ def parse_function(expr_input):
         return None, str(e)
 
 # -----------------------------
-# Convert LN to sp.log for numerical evaluation
+# Convert LN and Log10 to sp.log for numerical evaluation
 # -----------------------------
 def convert_for_numpy(expr):
-    """Convert LN to sp.log for lambdify"""
-    return expr.replace(LN, lambda arg: sp.log(arg.args[0]))
+    """Convert LN and Log10 to sp.log for lambdify"""
+    expr = expr.replace(LN, lambda arg: sp.log(arg.args[0]))
+    expr = expr.replace(Log10, lambda arg: sp.log(arg.args[0], 10))
+    return expr
 
 # -----------------------------
 # Domain analyzer
@@ -103,6 +119,8 @@ def analyze_domain(expr):
     for arg in expr.atoms(sp.log):
         conditions.append(sp.latex(arg.args[0]) + r" > 0")
     for arg in expr.atoms(LN):
+        conditions.append(sp.latex(arg.args[0]) + r" > 0")
+    for arg in expr.atoms(Log10):
         conditions.append(sp.latex(arg.args[0]) + r" > 0")
     denom = sp.denom(expr)
     if denom != 1:
@@ -338,15 +356,14 @@ elif topic == "Partial Derivatives":
     f_eval = convert_for_numpy(f)
     if uses_x and uses_y:
         f_np = sp.lambdify((x, y), f_eval, "numpy")
+        fx_np = sp.lambdify((x, y), fx_eval, "numpy")
+        fy_np = sp.lambdify((x, y), fy_eval, "numpy")
     elif uses_x:
         f_np = sp.lambdify(x, f_eval, "numpy")
+        fx_np = sp.lambdify(x, fx_eval, "numpy")
     elif uses_y:
         f_np = sp.lambdify(y, f_eval, "numpy")
-
-    if uses_x:
-        fx_np = sp.lambdify((x, y), fx_eval, "numpy") if uses_y else sp.lambdify(x, fx_eval, "numpy")
-    if uses_y:
-        fy_np = sp.lambdify((x, y), fy_eval, "numpy") if uses_x else sp.lambdify(y, fy_eval, "numpy")
+        fy_np = sp.lambdify(y, fy_eval, "numpy")
 
     t = np.linspace(-5, 5, 200)
 
@@ -375,6 +392,7 @@ elif topic == "Partial Derivatives":
         ax1.grid(True)
 
         st.pyplot(fig1)
+        plt.close(fig1)
     else:
         st.info("ℹ️ No x-direction graph (function does not depend on x).")
 
@@ -413,6 +431,7 @@ elif topic == "Partial Derivatives":
         ax2.grid(True)
 
         st.pyplot(fig2)
+        plt.close(fig2)
     else:
         st.info("ℹ️ No y-direction graph (function does not depend on y).")
 
