@@ -564,10 +564,10 @@ elif topic == "Differentials":
         rf"\Delta f = f(x_0+dx, y_0+dy) - f(x_0, y_0) = {f_actual_str} - {f_x0_y0_str} = {delta_f_str}"
     )
 
-    # Error
+    # Error of differential approximation
     error_value = abs(delta_f - df_numeric)
     if error_value != 0:
-        error_sci = f"{error_value/10**int(np.floor(np.log10(error_value))):.3g}*10^{int(np.floor(np.log10(error_value)))}"
+        error_sci = f"{error_value/10**int(np.floor(np.log10(abs(error_value)))):.3g}*10^{int(np.floor(np.log10(abs(error_value))))}"
     else:
         error_sci = "0"
     st.warning(f"Error of differential approximation = |Δf - df| ≈ {error_sci}")
@@ -580,22 +580,11 @@ elif topic == "Differentials":
     # General L(x,y) formula
     st.latex(r"L(x, y) = f(x_0, y_0) + f_x(x_0, y_0) \cdot (x - x_0) + f_y(x_0, y_0) \cdot (y - y_0)")
 
-    # Numeric evaluation of f at (x0, y0) and f at (x0+dx, y0+dy)
-    f_np = sp.lambdify((x, y), f, "numpy")
-    f_x0_y0_val = f_np(x0, y0)
-    f_actual_val = f_np(x0 + dx, y0 + dy)
-
     # Increment calculation for linear approximation
-    L_increment = fx_numeric*dx + fy_numeric*dy
-
-    # Format numbers for 4sf with trailing zeros
-    f_x0_y0_str = format_4sf(f_x0_y0_val)
-    df_x_str = format_4sf(fx_numeric*dx)
-    df_y_str = format_4sf(fy_numeric*dy)
+    L_increment = df_numeric
     L_increment_str = format_4sf(L_increment)
-    L_approx_val = f_x0_y0_val + L_increment
+    L_approx_val = float(f_x0_y0_str) + L_increment
     L_approx_str = format_4sf(L_approx_val)
-    f_actual_str = format_4sf(f_actual_val)
 
     # Show increment calculation
     st.latex(
@@ -608,16 +597,15 @@ elif topic == "Differentials":
     )
 
     # -----------------------------
-    # Linear approximation error (display like Step 2)
+    # Linear approximation error (Step 2 style)
     # -----------------------------
-    linear_error_val = float(f_actual_str) - float(L_approx_str)  # compute using displayed values
-    linear_error_str = format_4sf(linear_error_val)
+    linear_error_val = float(f_actual_str) - float(L_approx_str)  # use values from previous part
+    if linear_error_val != 0:
+        linear_error_sci = f"{abs(linear_error_val)/10**int(np.floor(np.log10(abs(linear_error_val)))):.3g}*10^{int(np.floor(np.log10(abs(linear_error_val))))}"
+    else:
+        linear_error_sci = "0"
 
-    st.latex(
-        rf"\text{{Linear Approximation Error}} = f(x_0+dx, y_0+dy) - L(x_0+dx, y_0+dy) = "
-        rf"{f_actual_str} - {L_approx_str} = {linear_error_str}"
-    )
-
+    st.warning(f"Linear approximation error = |f(x0+dx, y0+dy) - L(x0+dx, y0+dy)| ≈ {linear_error_sci}")
 
     st.info(
         "Summary:\n"
@@ -625,4 +613,3 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
-    
