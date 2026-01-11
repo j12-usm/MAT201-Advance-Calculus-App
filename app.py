@@ -36,15 +36,30 @@ def parse_function(expr_input):
     except Exception as e:
         return None, str(e)
 
-def latex_with_user_log(expr, original_input):
-    latex_str = sp.latex(expr)
+def latex_with_mixed_ln_log(expr, original_input):
+    """
+    Correctly display:
+    - ln(x)        for natural log
+    - log_{10}(x)  for base-10 log
+    """
 
-    if "ln(" in original_input and "log(" not in original_input:
-        # User prefers ln
-        latex_str = latex_str.replace(r"\log", r"\ln")
+    def _log_to_latex(e):
+        if isinstance(e, sp.log):
+            arg = e.args[0]
 
-    # If user typed log(...), keep \log as-is
-    return latex_str
+            # log(x, 10) → base-10
+            if len(e.args) == 2 and e.args[1] == 10:
+                return r"\log_{10}\!\left(" + sp.latex(arg) + r"\right)"
+
+            # log(x) → natural log
+            return r"\ln\!\left(" + sp.latex(arg) + r"\right)"
+
+        return sp.latex(e)
+
+    return sp.latex(expr, fold_short_frac=True, symbol_names={}, 
+                    mul_symbol="dot", 
+                    printer=_log_to_latex)
+
 
 # -----------------------------
 # LaTeX display helpers
