@@ -23,8 +23,8 @@ class LN(sp.Function):
     def eval(cls, arg):
         return None
     
-    def _eval_derivative(self, arg):
-        return 1/arg
+    def _eval_derivative(self, s):
+        return 1/self.args[0]
     
     def _eval_evalf(self, prec):
         return sp.log(self.args[0])._eval_evalf(prec)
@@ -39,8 +39,8 @@ class Log10(sp.Function):
     def eval(cls, arg):
         return None
     
-    def _eval_derivative(self, arg):
-        return 1/(arg * LN(10))
+    def _eval_derivative(self, s):
+        return 1/(self.args[0] * LN(10))
     
     def _eval_evalf(self, prec):
         return sp.log(self.args[0], 10)._eval_evalf(prec)
