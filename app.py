@@ -515,7 +515,7 @@ elif topic == "Differentials":
     )
     
     # -----------------------------
-    # Step 2: Differential df with bracketed substitution
+    # Step 2: Differential df with bracketed substitution and actual change Δf
     # -----------------------------
     st.markdown("### Step 2: Differential df = f_x*dx + f_y*dy with explicit bracketed substitution")
 
@@ -526,11 +526,20 @@ elif topic == "Differentials":
     st.success(f"Numeric value: df ≈ {df_numeric:.5f}")
 
     # Actual change Δf with explicit substitution
+    f_x0_y0 = float(f.subs({x: x0, y: y0}))  # f(x0, y0)
     actual_x = x0 + dx
     actual_y = y0 + dy
+    f_actual_x_y = float(f.subs({x: actual_x, y: actual_y}))  # f(x0+dx, y0+dy)
+
+    # Formula string for display
     f_actual_formula_str = sp.latex(f).replace('x', f'({actual_x})').replace('y', f'({actual_y})')
-    actual_value = f_np(actual_x, actual_y) - f_np(x0, y0)
-    st.latex(rf"\Delta f = f(x_0+dx, y_0+dy) - f(x_0, y_0) = f({actual_x},{actual_y}) - f({x0},{y0}) = {f_actual_formula_str} - {f_at_point} = {actual_value:.5f}")
+    f_x0_y0_formula_str = sp.latex(f).replace('x', f'({x0})').replace('y', f'({y0})')
+
+    st.latex(
+        rf"\Delta f = f(x_0+dx, y_0+dy) - f(x_0, y_0) = "
+        rf"f({actual_x},{actual_y}) - f({x0},{y0}) = "
+        rf"{f_actual_formula_str} - {f_x0_y0_formula_str} = {f_actual_x_y - f_x0_y0:.5f}"
+    )
 
 
     # Error in scientific notation
