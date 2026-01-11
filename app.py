@@ -545,28 +545,38 @@ elif topic == "Differentials":
     st.warning(f"Error of differential approximation = |Δf - df| ≈ {error_sci}")
 
     # -----------------------------
-    # Linear approximation (tangent plane)
+    # Step 3: Linear approximation (tangent plane) with bracketed substitution
     # -----------------------------
+    st.markdown("### Step 3: Linear approximation (tangent plane) L(x₀+dx, y₀+dy) with explicit bracketed substitution")
+
+    # f(x0, y0)
     f_at_point = float(f.subs({x: x0, y: y0}))
-    L_increment = df_numeric
+
+    # Increment = fx*dx + fy*dy
+    L_increment_formula = f"({fx_numeric})*({dx}) + ({fy_numeric})*({dy})"
+    L_increment = df_numeric  # same as df_numeric
+
+    # Linear approximation
     L_approx = f_at_point + L_increment
+
+    # True value
+    f_np = sp.lambdify((x, y), f, "numpy")
     true_value = f_np(x0 + dx, y0 + dy)
+
+    # Display
+    st.latex(rf"f(x_0, y_0) = f({x0},{y0}) = {f_at_point}")
+    st.latex(rf"Increment = f_x*dx + f_y*dy = {L_increment_formula} = {L_increment:.5f}")
+    st.latex(rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_at_point} + {L_increment:.5f} = {L_approx:.5f}")
+    st.latex(rf"True\ f(x_0 + dx, y_0 + dy) = f({x0+dx},{y0+dy}) = {true_value:.5f}")
+
+    # Optional: Linear approximation error
     linear_error = abs(true_value - L_approx)
     if linear_error != 0:
         linear_error_sci = f"{linear_error/10**int(np.floor(np.log10(linear_error))):.3f}*10^{int(np.floor(np.log10(linear_error)))}"
     else:
         linear_error_sci = "0"
-
-    st.subheader("Linear Approximation (Tangent Plane)")
-    st.latex(r"L(x,y) = f(x₀, y₀) + f_x(x₀,y₀)(x-x₀) + f_y(x₀,y₀)(y-y₀)")
-
-    st.markdown(f"f({x0},{y0}) = {f_at_point:.5f}")
-    st.markdown(
-        f"Increment = f_x*dx + f_y*dy = ({fx_numeric})*({dx}) + ({fy_numeric})*({dy}) = {L_increment:.5f}"
-    )
-    st.success(f"L(x₀ + dx, y₀ + dy) ≈ {L_approx:.5f}")
-    st.info(f"True f(x₀ + dx, y₀ + dy) = {true_value:.5f}")
     st.warning(f"Linear approximation error ≈ {linear_error_sci}")
+
 
     st.info(
         "Summary:\n"
