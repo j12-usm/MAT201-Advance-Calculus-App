@@ -573,24 +573,17 @@ elif topic == "Differentials":
     # General L(x,y) formula
     st.latex(r"L(x, y) = f(x_0, y_0) + f_x(x_0, y_0) \cdot (x - x_0) + f_y(x_0, y_0) \cdot (y - y_0)")
 
-    # Evaluate L at (x0, y0)
-    L_x0_y0 = float(f_x0_y0) + fx_numeric*(x0 - x0) + fy_numeric*(y0 - y0)
-    L_x0_y0_str = format_4sf(L_x0_y0)
-    st.latex(
-        rf"L(x_0, y_0) = f(x_0, y_0) + f_x(x_0,y_0)*(x_0 - x_0) + f_y(x_0,y_0)*(y_0 - y_0) = {f_x0_y0_str} + 0 + 0 = {L_x0_y0_str}"
-    )
-
     # Increment = df
     L_increment = df_numeric
     L_increment_str = format_4sf(L_increment)
 
     # Linear approximation at (x0+dx, y0+dy)
-    L_approx = L_x0_y0 + L_increment
+    L_approx = float(f_x0_y0) + L_increment
     L_approx_str = format_4sf(L_approx)
 
-    # Show L(x0+dx, y0+dy)
+    # Show L(x0+dx,y0+dy)
     st.latex(
-        rf"L(x_0 + dx, y_0 + dy) = L(x_0, y_0) + Increment = {L_x0_y0_str} + {L_increment_str} = {L_approx_str}"
+        rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_x0_y0_str} + {L_increment_str} = {L_approx_str}"
     )
 
     # Linear approximation error
