@@ -40,7 +40,7 @@ class Log10(sp.Function):
         return None
     
     def _eval_derivative(self, arg):
-        return 1/(arg * sp.log(10))
+        return 1/(arg * LN(10))
     
     def _eval_evalf(self, prec):
         return sp.log(self.args[0], 10)._eval_evalf(prec)
