@@ -37,11 +37,6 @@ def parse_function(expr_input):
         return None, str(e)
 
 def latex_with_mixed_ln_log(expr, original_input):
-    """
-    Correctly display:
-    - ln(x)        for natural log
-    - log_{10}(x)  for base-10 log
-    """
 
     def _log_to_latex(e):
         if isinstance(e, sp.log):
@@ -65,24 +60,28 @@ def latex_with_mixed_ln_log(expr, original_input):
 # LaTeX display helpers
 # -----------------------------
 def latex_with_mixed_ln_log(expr, original_input):
-    # IMPORTANT: simplify to kill fake denominators like log(10)
     expr = sp.simplify(expr)
 
-    user_wants_plain_log = "log(" in original_input and "ln(" not in original_input
+    user_used_ln = "ln(" in original_input
+    user_used_log = "log(" in original_input
 
     def _log_to_latex(e):
         if isinstance(e, sp.log):
             arg = e.args[0]
 
-            # If user typed log(x), KEEP log(x)
-            if user_wants_plain_log:
-                return r"\log\!\left(" + sp.latex(arg) + r"\right)"
-
             # Explicit base-10 log
             if len(e.args) == 2 and e.args[1] == 10:
                 return r"\log_{10}\!\left(" + sp.latex(arg) + r"\right)"
 
-            # Natural log
+            # User typed ln(x)
+            if user_used_ln:
+                return r"\ln\!\left(" + sp.latex(arg) + r"\right)"
+
+            # User typed log(x)
+            if user_used_log:
+                return r"\log\!\left(" + sp.latex(arg) + r"\right)"
+
+            # fallback
             return r"\ln\!\left(" + sp.latex(arg) + r"\right)"
 
         return sp.latex(e)
