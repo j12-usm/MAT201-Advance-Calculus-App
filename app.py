@@ -65,18 +65,30 @@ def latex_with_mixed_ln_log(expr, original_input):
 # LaTeX display helpers
 # -----------------------------
 def latex_with_mixed_ln_log(expr, original_input):
-    latex_str = sp.latex(expr)
+    # IMPORTANT: simplify to kill fake denominators like log(10)
+    expr = sp.simplify(expr)
 
-    # Replace base-10 logs with explicit log_10
-    latex_str = latex_str.replace(
-        r"\log{\left(", r"\log_{10}\!\left("
-    )
+    user_wants_plain_log = "log(" in original_input and "ln(" not in original_input
 
-    # Preserve ln if user typed ln
-    if "ln(" in original_input:
-        latex_str = latex_str.replace(r"\log", r"\ln")
+    def _log_to_latex(e):
+        if isinstance(e, sp.log):
+            arg = e.args[0]
 
-    return latex_str
+            # If user typed log(x), KEEP log(x)
+            if user_wants_plain_log:
+                return r"\log\!\left(" + sp.latex(arg) + r"\right)"
+
+            # Explicit base-10 log
+            if len(e.args) == 2 and e.args[1] == 10:
+                return r"\log_{10}\!\left(" + sp.latex(arg) + r"\right)"
+
+            # Natural log
+            return r"\ln\!\left(" + sp.latex(arg) + r"\right)"
+
+        return sp.latex(e)
+
+    return sp.latex(expr, printer=_log_to_latex)
+
 # -----------------------------
 # Custom display (show ln instead of log)
 # -----------------------------
