@@ -487,39 +487,40 @@ elif topic == "Differentials":
         dy = st.number_input("dy", value=0.1)
 
     # -----------------------------
-    # Step 1: Evaluate fx and fy at (x0,y0) in full 4-step style
+    # Step 1: Evaluate fx and fy at (x0,y0) in full 4-step substitution style
     # -----------------------------
     st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$ in full substitution format")
 
     # fx
     fx_symbolic = sp.latex(fx)  # symbolic fx
-    fx_subs_a_b = fx.subs({x: x0, y: y0})  # plug in numbers
-    fx_numeric = float(fx_subs_a_b)
+    fx_substitute = fx.subs({x: x0, y: y0})  # substitution into (x0, y0)
+    fx_numeric = float(fx_substitute)
+    fx_substitute_latex = sp.latex(fx_symbolic).replace('x', str(x0)).replace('y', str(y0))  # formula with numbers
 
     st.latex(
-        rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {sp.latex(fx_symbolic).replace('x','{0}').replace('y','{1}')} = {sp.latex(fx_subs_a_b)} \approx {fx_numeric}"
+        rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {fx_substitute_latex} = {sp.latex(fx_substitute)} \approx {fx_numeric}"
     )
 
     # fy
     fy_symbolic = sp.latex(fy)  # symbolic fy
-    fy_subs_a_b = fy.subs({x: x0, y: y0})  # plug in numbers
-    fy_numeric = float(fy_subs_a_b)
+    fy_substitute = fy.subs({x: x0, y: y0})
+    fy_numeric = float(fy_substitute)
+    fy_substitute_latex = sp.latex(fy_symbolic).replace('x', str(x0)).replace('y', str(y0))
 
     st.latex(
-        rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {sp.latex(fy_symbolic).replace('x','{0}').replace('y','{1}')} = {sp.latex(fy_subs_a_b)} \approx {fy_numeric}"
+        rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {fy_substitute_latex} = {sp.latex(fy_substitute)} \approx {fy_numeric}"
     )
-
 
     # -----------------------------
     # Step 2: Multiply by dx and dy
     # -----------------------------
-    df_x = fx_val * dx
-    df_y = fy_val * dy
+    df_x = fx_numeric * dx
+    df_y = fy_numeric * dy
     df_numeric = df_x + df_y
 
     st.markdown(
         f"### Step 2: Multiply by increments dx, dy\n"
-        f"df = f_x*dx + f_y*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {df_numeric:.5f}"
+        f"df = f_x*dx + f_y*dy = ({fx_numeric})*({dx}) + ({fy_numeric})*({dy}) = {df_numeric:.5f}"
     )
     st.success(f"Numeric value: df ≈ {df_numeric:.5f}")
 
@@ -559,7 +560,7 @@ elif topic == "Differentials":
 
     st.markdown(f"f({x0},{y0}) = {f_at_point:.5f}")
     st.markdown(
-        f"Increment = f_x*dx + f_y*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {L_increment:.5f}"
+        f"Increment = f_x*dx + f_y*dy = ({fx_numeric})*({dx}) + ({fy_numeric})*({dy}) = {L_increment:.5f}"
     )
     st.success(f"L(x₀ + dx, y₀ + dy) ≈ {L_approx:.5f}")
     st.info(f"True f(x₀ + dx, y₀ + dy) = {true_value:.5f}")
@@ -571,4 +572,3 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
-
