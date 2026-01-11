@@ -544,7 +544,7 @@ elif topic == "Differentials":
         error_sci = "0"
     st.warning(f"Error of differential approximation = |Δf - df| ≈ {error_sci}")
 
-        # -----------------------------
+    # -----------------------------
     # Step 3: Linear approximation (tangent plane) with explicit substitution like Step 1
     # -----------------------------
     st.markdown("### Step 3: Linear approximation (tangent plane)")
