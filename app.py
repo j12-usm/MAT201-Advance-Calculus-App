@@ -16,6 +16,10 @@ x, y = sp.symbols("x y", real=True)
 # -----------------------------
 # Safe function parser
 # -----------------------------
+
+def log10(x):
+    return sp.log(x, 10)
+
 def parse_function(expr_input):
     try:
         expr_input = expr_input.replace("^", "**")
@@ -23,7 +27,10 @@ def parse_function(expr_input):
             "x": x, "y": y,
             "sin": sp.sin, "cos": sp.cos, "tan": sp.tan,
             "asin": sp.asin, "acos": sp.acos, "atan": sp.atan,
-            "exp": sp.exp, "sqrt": sp.sqrt, "ln": sp.log, "log": sp.log, "e": sp.E,
+            "exp": sp.exp, "sqrt": sp.sqrt,
+            "ln": sp.log,          # natural log
+            "log": log10,          # base-10 log
+            "e": sp.E,
         })
         return f, None
     except Exception as e:
@@ -39,28 +46,22 @@ def latex_with_user_log(expr, original_input):
     # If user typed log(...), keep \log as-is
     return latex_str
 
+# -----------------------------
+# LaTeX display helpers
+# -----------------------------
 def latex_with_mixed_ln_log(expr, original_input):
     latex_str = sp.latex(expr)
 
-    # Count how many ln(...) appear in the original input
-    ln_count = len(re.findall(r"\bln\s*\(", original_input))
-    log_count = len(re.findall(r"\blog\s*\(", original_input))
+    # Replace base-10 logs with explicit log_10
+    latex_str = latex_str.replace(
+        r"\log{\left(", r"\log_{10}\!\left("
+    )
 
-    # Find all \log occurrences in LaTeX
-    log_positions = [m.start() for m in re.finditer(r"\\log", latex_str)]
+    # Preserve ln if user typed ln
+    if "ln(" in original_input:
+        latex_str = latex_str.replace(r"\log", r"\ln")
 
-    # Replace first N logs with \ln where N = ln_count
-    latex_list = list(latex_str)
-    replaced = 0
-
-    for pos in log_positions:
-        if replaced >= ln_count:
-            break
-        latex_list[pos:pos+4] = list(r"\ln")
-        replaced += 1
-
-    return "".join(latex_list)
-
+    return latex_str
 # -----------------------------
 # Custom display (show ln instead of log)
 # -----------------------------
