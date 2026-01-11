@@ -104,8 +104,8 @@ def parse_function(expr_input):
 # -----------------------------
 def convert_for_numpy(expr):
     """Convert LN and Log10 to sp.log for lambdify"""
-    expr = expr.replace(LN, lambda arg: sp.log(arg.args[0]))
-    expr = expr.replace(Log10, lambda arg: sp.log(arg.args[0], 10))
+    expr = expr.replace(lambda e: isinstance(e, LN), lambda e: sp.log(e.args[0]))
+    expr = expr.replace(lambda e: isinstance(e, Log10), lambda e: sp.log(e.args[0], 10))
     return expr
 
 # -----------------------------
