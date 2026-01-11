@@ -489,7 +489,7 @@ elif topic == "Differentials":
     # -----------------------------
     # Step 1: Evaluate fx and fy at (x0,y0)
     # -----------------------------
-    st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$ with explicit bracketed substitution")
+    st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$")
 
     # fx
     fx_sub = fx.subs({x: x0, y: y0})
@@ -512,7 +512,7 @@ elif topic == "Differentials":
     # -----------------------------
     # Step 2: Differential df and Δf
     # -----------------------------
-    st.markdown("### Step 2: Differential df = f_x*dx + f_y*dy with explicit bracketed substitution, including f(x0,y0) and f(x0+dx,y0+dy)")
+    st.markdown("### Step 2: Differential df = f_x*dx + f_y*dy and actual change in f")
 
     # Differential
     df_formula = f"({fx_numeric})*({dx}) + ({fy_numeric})*({dy})"
@@ -520,20 +520,22 @@ elif topic == "Differentials":
     st.latex(rf"df = f_x*dx + f_y*dy = {df_formula} = {df_numeric:.5f}")
     st.success(f"Numeric value: df ≈ {df_numeric:.5f}")
 
-    # Actual change Δf
+    # Actual change Δf with substitution like Step 1
     f_x0_y0 = f.subs({x: x0, y: y0})
     actual_x = x0 + dx
     actual_y = y0 + dy
     f_actual_x_y = f.subs({x: actual_x, y: actual_y})
 
-    # Show f(x0,y0)
+    # Show f(x0, y0)
+    f_x0_y0_formula = sp.latex(f).replace('x', f'({x0})').replace('y', f'({y0})')
     st.latex(
-        rf"f(x_0, y_0) = f({x0},{y0}) = {sp.latex(f_x0_y0)} = {float(f_x0_y0):.5f}"
+        rf"f(x_0, y_0) = f({x0},{y0}) = {f_x0_y0_formula} = {float(f_x0_y0):.5f}"
     )
 
     # Show f(x0+dx, y0+dy)
+    f_actual_formula = sp.latex(f).replace('x', f'({actual_x})').replace('y', f'({actual_y})')
     st.latex(
-        rf"f(x_0+dx, y_0+dy) = f({actual_x},{actual_y}) = {sp.latex(f_actual_x_y)} = {float(f_actual_x_y):.5f}"
+        rf"f(x_0+dx, y_0+dy) = f({actual_x},{actual_y}) = {f_actual_formula} = {float(f_actual_x_y):.5f}"
     )
 
     # Δf calculation
@@ -555,7 +557,6 @@ elif topic == "Differentials":
     # -----------------------------
     st.markdown("### Step 3: Linear approximation (tangent plane)")
 
-    # Linear approximation
     L_increment = df_numeric
     L_approx = float(f_x0_y0) + L_increment
 
