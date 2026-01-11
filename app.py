@@ -580,11 +580,22 @@ elif topic == "Differentials":
     # General L(x,y) formula
     st.latex(r"L(x, y) = f(x_0, y_0) + f_x(x_0, y_0) \cdot (x - x_0) + f_y(x_0, y_0) \cdot (y - y_0)")
 
-    # Linear approximation at (x0+dx, y0+dy) using increment
-    L_increment_str = df_numeric_str
-    L_approx = float(f_x0_y0) + df_numeric
-    L_approx_str = format_4sf(L_approx)
+    # Linear approximation increment shown with calculation
+    L_increment_x = fx_numeric * dx
+    L_increment_y = fy_numeric * dy
+    L_increment = L_increment_x + L_increment_y
 
+    L_increment_x_str = format_4sf(L_increment_x)
+    L_increment_y_str = format_4sf(L_increment_y)
+    L_increment_str = format_4sf(L_increment)
+
+    st.latex(
+        rf"Increment = f_x*dx + f_y*dy = ({fx_numeric_str})*({dx}) + ({fy_numeric_str})*({dy}) = {L_increment_x_str} + {L_increment_y_str} = {L_increment_str}"
+    )
+
+    # Linear approximation at (x0+dx,y0+dy)
+    L_approx = float(f_x0_y0) + L_increment
+    L_approx_str = format_4sf(L_approx)
     st.latex(
         rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_x0_y0_str} + {L_increment_str} = {L_approx_str}"
     )
@@ -603,4 +614,3 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
-
