@@ -59,34 +59,34 @@ def latex_with_mixed_ln_log(expr, original_input):
 # -----------------------------
 # LaTeX display helpers
 # -----------------------------
+from sympy.printing.latex import LatexPrinter
+
 def latex_with_mixed_ln_log(expr, original_input):
     expr = sp.simplify(expr)
 
     user_used_ln = "ln(" in original_input
     user_used_log = "log(" in original_input
 
-    def _log_to_latex(e):
-        if isinstance(e, sp.log):
-            arg = e.args[0]
+    class CustomLatexPrinter(LatexPrinter):
+        def _print_log(self, expr):
+            arg = expr.args[0]
 
             # Explicit base-10 log
-            if len(e.args) == 2 and e.args[1] == 10:
-                return r"\log_{10}\!\left(" + sp.latex(arg) + r"\right)"
+            if len(expr.args) == 2 and expr.args[1] == 10:
+                return r"\log_{10}\!\left(%s\right)" % self._print(arg)
 
             # User typed ln(x)
             if user_used_ln:
-                return r"\ln\!\left(" + sp.latex(arg) + r"\right)"
+                return r"\ln\!\left(%s\right)" % self._print(arg)
 
             # User typed log(x)
             if user_used_log:
-                return r"\log\!\left(" + sp.latex(arg) + r"\right)"
+                return r"\log\!\left(%s\right)" % self._print(arg)
 
             # fallback
-            return r"\ln\!\left(" + sp.latex(arg) + r"\right)"
+            return r"\ln\!\left(%s\right)" % self._print(arg)
 
-        return sp.latex(e)
-
-    return sp.latex(expr, printer=_log_to_latex)
+    return CustomLatexPrinter().doprint(expr)
 
 # -----------------------------
 # Custom display (show ln instead of log)
