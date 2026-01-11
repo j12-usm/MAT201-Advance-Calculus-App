@@ -609,7 +609,7 @@ elif topic == "Differentials":
 
     st.info(
         "Summary:\n"
-        "- Differential df shows the linear change: df = f_x*dx + f_y*dy\n"
+        "- Differential df shows the linear change: df = $f_x$dx + $f_y$dy\n"
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
