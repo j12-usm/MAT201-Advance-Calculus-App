@@ -3,6 +3,7 @@ import sympy as sp
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+import re
 
 # -----------------------------
 # Page setup
@@ -37,6 +38,28 @@ def latex_with_user_log(expr, original_input):
 
     # If user typed log(...), keep \log as-is
     return latex_str
+
+def latex_with_mixed_ln_log(expr, original_input):
+    latex_str = sp.latex(expr)
+
+    # Count how many ln(...) appear in the original input
+    ln_count = len(re.findall(r"\bln\s*\(", original_input))
+    log_count = len(re.findall(r"\blog\s*\(", original_input))
+
+    # Find all \log occurrences in LaTeX
+    log_positions = [m.start() for m in re.finditer(r"\\log", latex_str)]
+
+    # Replace first N logs with \ln where N = ln_count
+    latex_list = list(latex_str)
+    replaced = 0
+
+    for pos in log_positions:
+        if replaced >= ln_count:
+            break
+        latex_list[pos:pos+4] = list(r"\ln")
+        replaced += 1
+
+    return "".join(latex_list)
 
 # -----------------------------
 # Custom display (show ln instead of log)
@@ -111,7 +134,7 @@ if topic == "Function of Two Variables":
         st.error("❌ Invalid function syntax.")
         st.stop()
 
-    st.latex(rf"f(x,y) = {latex_with_user_log(f, expr_input)}")
+    st.latex(rf"f(x,y) = {latex_with_mixed_ln_log(f, expr_input)}")
 
     # Evaluation point
     col1, col2 = st.columns(2)
@@ -268,8 +291,9 @@ elif topic == "Partial Derivatives":
     fy = sp.diff(f, y)
 
     st.subheader("Symbolic Partial Derivatives")
-    st.latex(r"\frac{\partial f}{\partial x} = " + latex_with_user_log(fx, expr_input))
-    st.latex(r"\frac{\partial f}{\partial y} = " + latex_with_user_log(fy, expr_input))
+    st.latex(r"\frac{\partial f}{\partial x} = " + latex_with_mixed_ln_log(fx, expr_input))
+    st.latex(r"\frac{\partial f}{\partial y} = " + latex_with_mixed_ln_log(fy, expr_input))
+
 
     col1, col2 = st.columns(2)
     with col1: x0 = st.number_input("x₀", value=1.0)
@@ -352,9 +376,9 @@ elif topic == "Differentials":
     fy = sp.diff(f, y)
 
     st.subheader("Symbolic Partial Derivatives")
-    st.latex(r"\frac{\partial f}{\partial x} = " + latex_with_user_log(fx, expr_input))
-    st.latex(r"\frac{\partial f}{\partial y} = " + latex_with_user_log(fy, expr_input))
-    
+    st.latex(r"fx = " + latex_with_mixed_ln_log(fx, expr_input))
+    st.latex(r"fy = " + latex_with_mixed_ln_log(fy, expr_input))
+
     # -----------------------------
     # Input point and increments
     # -----------------------------
