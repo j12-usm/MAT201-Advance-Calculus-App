@@ -487,18 +487,18 @@ elif topic == "Differentials":
         dy = st.number_input("dy", value=0.1)
 
     # -----------------------------
-    # Step 1: Evaluate fx and fy at (x0,y0) in 4-step substitution style: formula with numbers
+    # Step 1: Evaluate fx and fy at (x0,y0) with bracketed substitution
     # -----------------------------
-    st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$ with explicit substitution")
+    st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$ with explicit bracketed substitution")
 
     # fx
     fx_sub = fx.subs({x: x0, y: y0})
     fx_numeric = float(fx_sub)
 
-    # Create explicit substitution string like: 3(a) - 4(b)
-    fx_sub_str = sp.srepr(fx)  # symbolic string representation
-    # For display, we use sp.latex with x0 and y0 substitution
-    fx_sub_formula = sp.latex(fx).replace('x', str(x0)).replace('y', str(y0))
+    # Create bracketed substitution formula string
+    fx_formula = sp.latex(fx)
+    # Replace x and y with brackets for substitution
+    fx_sub_formula = fx_formula.replace('x', f'({x0})').replace('y', f'({y0})')
 
     st.latex(
         rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {fx_sub_formula} = {fx_numeric}"
@@ -507,7 +507,8 @@ elif topic == "Differentials":
     # fy
     fy_sub = fy.subs({x: x0, y: y0})
     fy_numeric = float(fy_sub)
-    fy_sub_formula = sp.latex(fy).replace('x', str(x0)).replace('y', str(y0))
+    fy_formula = sp.latex(fy)
+    fy_sub_formula = fy_formula.replace('x', f'({x0})').replace('y', f'({y0})')
 
     st.latex(
         rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {fy_sub_formula} = {fy_numeric}"
