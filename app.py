@@ -487,22 +487,30 @@ elif topic == "Differentials":
         dy = st.number_input("dy", value=0.1)
 
     # -----------------------------
-    # Step 1: Evaluate fx and fy at (x0,y0) in proper 4-step display
+    # Step 1: Evaluate fx and fy at (x0,y0) in 4-step substitution style: formula with numbers
     # -----------------------------
-    st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$ in full substitution format")
+    st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$ with explicit substitution")
 
     # fx
-    fx_substitute = fx.subs({x: x0, y: y0})      # substitution
-    fx_numeric = float(fx_substitute)            # numeric value
+    fx_sub = fx.subs({x: x0, y: y0})
+    fx_numeric = float(fx_sub)
+
+    # Create explicit substitution string like: 3(a) - 4(b)
+    fx_sub_str = sp.srepr(fx)  # symbolic string representation
+    # For display, we use sp.latex with x0 and y0 substitution
+    fx_sub_formula = sp.latex(fx).replace('x', str(x0)).replace('y', str(y0))
+
     st.latex(
-        rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {sp.latex(fx)}\big|_{{x={x0},y={y0}}} = {sp.latex(fx_substitute)} \approx {fx_numeric}"
+        rf"f_x(x_0, y_0) = f_x({x0},{y0}) = {fx_sub_formula} = {fx_numeric}"
     )
 
     # fy
-    fy_substitute = fy.subs({x: x0, y: y0})
-    fy_numeric = float(fy_substitute)
+    fy_sub = fy.subs({x: x0, y: y0})
+    fy_numeric = float(fy_sub)
+    fy_sub_formula = sp.latex(fy).replace('x', str(x0)).replace('y', str(y0))
+
     st.latex(
-        rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {sp.latex(fy)}\big|_{{x={x0},y={y0}}} = {sp.latex(fy_substitute)} \approx {fy_numeric}"
+        rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {fy_sub_formula} = {fy_numeric}"
     )
 
     # -----------------------------
@@ -566,3 +574,4 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
+
