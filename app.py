@@ -513,18 +513,17 @@ elif topic == "Differentials":
     st.latex(
         rf"f_y(x_0, y_0) = f_y({x0},{y0}) = {fy_sub_formula} = {fy_numeric}"
     )
-
+    
     # -----------------------------
-    # Step 2: Multiply by dx and dy
+    # Step 2: Differential df with bracketed substitution
     # -----------------------------
-    df_x = fx_numeric * dx
-    df_y = fy_numeric * dy
-    df_numeric = df_x + df_y
+    st.markdown("### Step 2: Differential df = f_x*dx + f_y*dy with explicit bracketed substitution")
 
-    st.markdown(
-        f"### Step 2: Multiply by increments dx, dy\n"
-        f"df = f_x*dx + f_y*dy = ({fx_numeric})*({dx}) + ({fy_numeric})*({dy}) = {df_numeric:.5f}"
-    )
+    # Create explicit formula with brackets like Step 1
+    df_formula = f"({fx_numeric})*({dx}) + ({fy_numeric})*({dy})"
+    df_numeric = fx_numeric*dx + fy_numeric*dy
+
+    st.latex(rf"df = f_x*dx + f_y*dy = {df_formula} = {df_numeric:.5f}")
     st.success(f"Numeric value: df ≈ {df_numeric:.5f}")
 
     # -----------------------------
