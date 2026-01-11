@@ -503,18 +503,26 @@ elif topic == "Differentials":
     st.subheader("Differential df")
     st.latex(r"df = fx*dx + fy*dy")
 
-    # Step-by-step substitution for fx*dx
-    st.markdown(f"Step 1: Evaluate fx and fy at (x₀,y₀)")
-    st.markdown(f"fx = {sp.latex(fx)} → fx({x0},{y0}) = {sp.latex(fx_sub)} → numeric: {fx_val}")
-    st.markdown(f"fy = {sp.latex(fy)} → fy({x0},{y0}) = {sp.latex(fy_sub)} → numeric: {fy_val}")
+    # -----------------------------
+    # Step 1: Show fx(x0,y0) and fy(x0,y0)
+    # -----------------------------
+    st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$")
+    st.latex(
+        rf"f_x(x_0,y_0) = {sp.latex(fx)}\Big|_{{({x0},{y0})}} = {sp.latex(fx_sub)} \approx {fx_val}"
+    )
+    st.latex(
+        rf"f_y(x_0,y_0) = {sp.latex(fy)}\Big|_{{({x0},{y0})}} = {sp.latex(fy_sub)} \approx {fy_val}"
+    )
 
+    # -----------------------------
     # Step 2: Multiply by dx and dy with substitution
+    # -----------------------------
     df_x = fx_val * dx
     df_y = fy_val * dy
     df_numeric = df_x + df_y
 
     st.markdown(
-        f"Step 2: Multiply by increments dx, dy:\n"
+        f"### Step 2: Multiply by increments dx, dy:\n"
         f"df = fx*dx + fy*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {df_numeric:.5f}"
     )
     st.success(f"Numeric value: df ≈ {df_numeric:.5f}")
@@ -574,3 +582,4 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
+
