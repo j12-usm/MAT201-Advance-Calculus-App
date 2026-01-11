@@ -465,10 +465,6 @@ elif topic == "Differentials":
         st.error("Invalid function syntax.")
         st.stop()
         
-    vars_used = f.free_symbols
-    uses_x = x in vars_used
-    uses_y = y in vars_used
-
     # -----------------------------
     # Partial derivatives
     # -----------------------------
@@ -491,26 +487,24 @@ elif topic == "Differentials":
         dy = st.number_input("dy", value=0.1)
 
     # -----------------------------
-    # Evaluate fx and fy at point
-    # -----------------------------
-    fx_val = float(fx.subs({x: x0, y: y0}))
-    fy_val = float(fy.subs({x: x0, y: y0}))
-
-    # -----------------------------
-    # Step 1: Show fx(x0,y0) and fy(x0,y0) in full format
+    # Step 1: Evaluate fx and fy at (x0,y0) with full substitution
     # -----------------------------
     st.markdown("### Step 1: Evaluate partial derivatives at $(x_0, y_0)$")
 
-    # fx display
-    fx_sub = fx.subs({x: x0, y: y0})
+    # fx
+    fx_symbolic = sp.latex(fx)
+    fx_sub = sp.latex(fx.subs({x: x0, y: y0}))  # substitution form
+    fx_val = float(fx.subs({x: x0, y: y0}))     # numeric value
     st.latex(
-        rf"f_x(x_0,y_0) = f_x({x0},{y0}) = {sp.latex(fx_sub)} \approx {fx_val}"
+        rf"f_x(x_0,y_0) = f_x({x0},{y0}) = {fx_sub} \approx {fx_val}"
     )
 
-    # fy display
-    fy_sub = fy.subs({x: x0, y: y0})
+    # fy
+    fy_symbolic = sp.latex(fy)
+    fy_sub = sp.latex(fy.subs({x: x0, y: y0}))
+    fy_val = float(fy.subs({x: x0, y: y0}))
     st.latex(
-        rf"f_y(x_0,y_0) = f_y({x0},{y0}) = {sp.latex(fy_sub)} \approx {fy_val}"
+        rf"f_y(x_0,y_0) = f_y({x0},{y0}) = {fy_sub} \approx {fy_val}"
     )
 
     # -----------------------------
@@ -521,8 +515,8 @@ elif topic == "Differentials":
     df_numeric = df_x + df_y
 
     st.markdown(
-        f"### Step 2: Multiply by increments dx, dy:\n"
-        f"df = fx*dx + fy*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {df_numeric:.5f}"
+        f"### Step 2: Multiply by increments dx, dy\n"
+        f"df = f_x*dx + f_y*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {df_numeric:.5f}"
     )
     st.success(f"Numeric value: df ≈ {df_numeric:.5f}")
 
@@ -536,7 +530,7 @@ elif topic == "Differentials":
         f"f({x0+dx},{y0+dy}) - f({x0},{y0}) = {actual_change:.5f}"
     )
 
-    # Format error in scientific notation as *10^a
+    # Error in scientific notation
     error_value = abs(actual_change - df_numeric)
     if error_value != 0:
         error_sci = f"{error_value/10**int(np.floor(np.log10(error_value))):.3f}*10^{int(np.floor(np.log10(error_value)))}"
@@ -552,7 +546,6 @@ elif topic == "Differentials":
     L_approx = f_at_point + L_increment
     true_value = f_np(x0 + dx, y0 + dy)
     linear_error = abs(true_value - L_approx)
-
     if linear_error != 0:
         linear_error_sci = f"{linear_error/10**int(np.floor(np.log10(linear_error))):.3f}*10^{int(np.floor(np.log10(linear_error)))}"
     else:
@@ -563,7 +556,7 @@ elif topic == "Differentials":
 
     st.markdown(f"f({x0},{y0}) = {f_at_point:.5f}")
     st.markdown(
-        f"Increment = fx*dx + fy*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {L_increment:.5f}"
+        f"Increment = f_x*dx + f_y*dy = ({fx_val})*({dx}) + ({fy_val})*({dy}) = {L_increment:.5f}"
     )
     st.success(f"L(x₀ + dx, y₀ + dy) ≈ {L_approx:.5f}")
     st.info(f"True f(x₀ + dx, y₀ + dy) = {true_value:.5f}")
@@ -575,3 +568,4 @@ elif topic == "Differentials":
         "- Linear approximation L(x₀+dx, y₀+dy) uses the tangent plane at (x₀, y₀)\n"
         "- Smaller dx, dy → better approximation"
     )
+
