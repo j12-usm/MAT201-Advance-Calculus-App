@@ -449,7 +449,6 @@ elif topic == "Differentials":
     def format_4sf(val):
         if val == 0:
             return "0.000"
-        # Determine number of digits before decimal
         digits_before = int(np.floor(np.log10(abs(val)))) + 1
         decimal_places = max(0, 4 - digits_before)
         return f"{val:.{decimal_places}f}"
@@ -523,7 +522,7 @@ elif topic == "Differentials":
     # -----------------------------
     # Step 2: Differential df and Δf
     # -----------------------------
-    st.markdown("### Step 2: Differential df = f_x*dx + f_y*dy and actual change in f")
+    st.markdown("### Step 2: Differential df = f_x*dx + f_y*dy and change in f")
 
     # Differential
     df_numeric = fx_numeric*dx + fy_numeric*dy
@@ -531,7 +530,7 @@ elif topic == "Differentials":
     df_formula = f"({fx_numeric_str})*({dx}) + ({fy_numeric_str})*({dy})"
     st.latex(rf"df = f_x*dx + f_y*dy = {df_formula} = {df_numeric_str}")
 
-    # Actual change Δf with substitution like Step 1
+    # Actual change Δf
     f_x0_y0 = f.subs({x: x0, y: y0})
     f_x0_y0_str = format_4sf(float(f_x0_y0))
     actual_x = x0 + dx
@@ -567,9 +566,9 @@ elif topic == "Differentials":
     st.warning(f"Error of differential approximation = |Δf - df| ≈ {error_sci}")
 
     # -----------------------------
-    # Step 3: Linear approximation
+    # Linear approximation (separate, not Step 3)
     # -----------------------------
-    st.markdown("### Step 3: Linear approximation (tangent plane)")
+    st.markdown("### Linear approximation (tangent plane)")
 
     L_increment = df_numeric
     L_increment_str = format_4sf(L_increment)
