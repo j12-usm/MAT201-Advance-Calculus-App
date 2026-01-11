@@ -580,28 +580,35 @@ elif topic == "Differentials":
     # General L(x,y) formula
     st.latex(r"L(x, y) = f(x_0, y_0) + f_x(x_0, y_0) \cdot (x - x_0) + f_y(x_0, y_0) \cdot (y - y_0)")
 
-    # Linear approximation increment shown with calculation
-    L_increment_x = fx_numeric * dx
-    L_increment_y = fy_numeric * dy
-    L_increment = L_increment_x + L_increment_y
+    # Numeric evaluation of f at (x0, y0) and f at (x0+dx, y0+dy)
+    f_np = sp.lambdify((x, y), f, "numpy")
+    f_x0_y0_val = f_np(x0, y0)
+    f_actual_val = f_np(x0 + dx, y0 + dy)
 
-    L_increment_x_str = format_4sf(L_increment_x)
-    L_increment_y_str = format_4sf(L_increment_y)
+    # Increment calculation for linear approximation
+    L_increment = fx_numeric*dx + fy_numeric*dy
+
+    # Format numbers for 4sf with trailing zeros
+    f_x0_y0_str = format_4sf(f_x0_y0_val)
+    df_x_str = format_4sf(fx_numeric*dx)
+    df_y_str = format_4sf(fy_numeric*dy)
     L_increment_str = format_4sf(L_increment)
+    L_approx_val = f_x0_y0_val + L_increment
+    L_approx_str = format_4sf(L_approx_val)
+    f_actual_str = format_4sf(f_actual_val)
 
+    # Show increment calculation
     st.latex(
-        rf"Increment = f_x*dx + f_y*dy = ({fx_numeric_str})*({dx}) + ({fy_numeric_str})*({dy}) = {L_increment_x_str} + {L_increment_y_str} = {L_increment_str}"
+        rf"Increment = f_x*dx + f_y*dy = ({fx_numeric_str})*({dx}) + ({fy_numeric_str})*({dy}) = {df_x_str} + {df_y_str} = {L_increment_str}"
     )
 
-    # Linear approximation at (x0+dx,y0+dy)
-    L_approx = float(f_x0_y0) + L_increment
-    L_approx_str = format_4sf(L_approx)
+    # Linear approximation at (x0+dx, y0+dy)
     st.latex(
         rf"L(x_0 + dx, y_0 + dy) = f(x_0, y_0) + Increment = {f_x0_y0_str} + {L_increment_str} = {L_approx_str}"
     )
 
-    # Linear approximation error shown as f(x0+dx,y0+dy) - L(x0+dx,y0+dy)
-    linear_error = float(f_actual_x_y) - L_approx
+    # Linear approximation error directly from f and L
+    linear_error = f_actual_val - L_approx_val
     linear_error_str = format_4sf(linear_error)
     st.latex(
         rf"\text{{Linear Approximation Error}} = f(x_0+dx, y_0+dy) - L(x_0+dx, y_0+dy) = {f_actual_str} - {L_approx_str} = {linear_error_str}"
