@@ -19,11 +19,13 @@ x, y = sp.symbols("x y", real=True)
 class LN(sp.Function):
     """Custom natural logarithm function to distinguish from base-10 log"""
     
+    nargs = 1
+    
     @classmethod
     def eval(cls, arg):
         return None
     
-    def _eval_derivative(self, s):
+    def fdiff(self, argindex=1):
         return 1/self.args[0]
     
     def _eval_evalf(self, prec):
@@ -35,11 +37,13 @@ class LN(sp.Function):
 class Log10(sp.Function):
     """Custom base-10 logarithm function"""
     
+    nargs = 1
+    
     @classmethod
     def eval(cls, arg):
         return None
     
-    def _eval_derivative(self, s):
+    def fdiff(self, argindex=1):
         return 1/(self.args[0] * LN(10))
     
     def _eval_evalf(self, prec):
