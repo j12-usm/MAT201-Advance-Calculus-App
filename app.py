@@ -347,46 +347,71 @@ elif topic == "Partial Derivatives":
 
     t = np.linspace(-5, 5, 200)
 
-# w.r.t x
-    if uses_x:
-        x_vals = t
-        y_fixed = np.full_like(x_vals, y0) if uses_y else None
-        f_vals_x = f_np(x_vals, y_fixed) if uses_y else f_np(x_vals)
-        fx_vals = fx_np(x_vals, y_fixed) if uses_y else fx_np(x_vals)
+ # w.r.t x
+if uses_x:
+    x_vals = t
+    y_fixed = np.full_like(x_vals, y0) if uses_y else None
 
-        fig1, ax1 = plt.subplots(figsize=(6,4))
-        ax1.plot(x_vals, f_vals_x, label=f"f(x, {y0})", color="blue")
-        ax1.plot(x_vals, fx_vals, label=f"∂f/∂x at y={y0}", color="red", linestyle="--")
-        ax1.scatter(x0, f_np(x0, y0), color="green", s=50)
-        ax1.text(x0, f_np(x0, y0), f"({x0:.2f},{f_np(x0,y0):.2f})", fontsize=9,
-                 ha="left", va="bottom", color="green")
-        ax1.set_xlabel("x"); ax1.set_ylabel("f(x, y₀) and ∂f/∂x")
-        ax1.set_title("Rate of Change w.r.t x")
-        ax1.legend(); ax1.grid(True)
-        st.pyplot(fig1)
-    else:
-        st.info("ℹ️ No x-direction graph (function does not depend on x).")
+    f_vals_x = f_np(x_vals, y_fixed) if uses_y else f_np(x_vals)
+    fx_vals = fx_np(x_vals, y_fixed) if uses_y else fx_np(x_vals)
+
+    fig1, ax1 = plt.subplots(figsize=(6,4))
+    ax1.plot(x_vals, f_vals_x, label=f"f(x, {y0})", color="blue")
+    ax1.plot(x_vals, fx_vals, label=f"∂f/∂x at y={y0}", color="red", linestyle="--")
+    ax1.scatter(x0, f_np(x0, y0) if uses_y else f_np(x0), color="green", s=50)
+    ax1.text(
+        x0,
+        f_np(x0, y0) if uses_y else f_np(x0),
+        f"({x0:.2f},{(f_np(x0, y0) if uses_y else f_np(x0)):.2f})",
+        fontsize=9, ha="left", va="bottom", color="green"
+    )
+    ax1.set_xlabel("x")
+    ax1.set_ylabel("f(x, y₀) and ∂f/∂x")
+    ax1.set_title("Rate of Change w.r.t x")
+    ax1.legend()
+    ax1.grid(True)
+
+    st.pyplot(fig1)
+else:
+    st.info("ℹ️ No x-direction graph (function does not depend on x).")
+
     
-    # w.r.t y
-    if uses_y: 
-        y_vals = t
-        x_fixed = np.full_like(y_vals, x0) if uses_x else None 
-        fy_vals = fy_np(x_fixed, y_vals) if uses_x else f_np(y_vals)
-        f_vals_y = f_np(x_fixed, y_vals) if uses_x else fy_np(y_vals)
+   # w.r.t y
+if uses_y:
+    y_vals = t
+    x_fixed = np.full_like(y_vals, x0) if uses_x else None
 
-        fig2, ax2 = plt.subplots(figsize=(6,4))
-        ax2.plot(y_vals, f_vals_y, label=f"f({x0}, y)", color="blue")
-        ax2.plot(y_vals, fy_vals, label=f"∂f/∂y at x={x0}", color="red", linestyle="--")
-        ax2.scatter(y0, f_np(x0, y0), color="green", s=50)
-        ax2.text(y0, f_np(x0, y0), f"({y0:.2f},{f_np(x0,y0):.2f})", fontsize=9,
-                 ha="left", va="bottom", color="green")
-        ax2.set_xlabel("y"); ax2.set_ylabel("f(x₀, y) and ∂f/∂y")
-        ax2.set_title("Rate of Change w.r.t y")
-        ax2.legend(); ax2.grid(True)
-        st.pyplot(fig2)
-    else:
-        st.info("ℹ️ No y-direction graph (function does not depend on y).")
+    f_vals_y = f_np(x_fixed, y_vals) if uses_x else f_np(y_vals)
+    fy_vals = fy_np(x_fixed, y_vals) if uses_x else fy_np(y_vals)
 
+    fig2, ax2 = plt.subplots(figsize=(6,4))
+    ax2.plot(y_vals, f_vals_y, label=f"f({x0}, y)", color="blue")
+    ax2.plot(y_vals, fy_vals, label=f"∂f/∂y at x={x0}", color="red", linestyle="--")
+    ax2.scatter(
+        y0,
+        f_np(x0, y0) if uses_x else f_np(y0),
+        color="green",
+        s=50
+    )
+    ax2.text(
+        y0,
+        f_np(x0, y0) if uses_x else f_np(y0),
+        f"({y0:.2f},{(f_np(x0, y0) if uses_x else f_np(y0)):.2f})",
+        fontsize=9,
+        ha="left",
+        va="bottom",
+        color="green"
+    )
+
+    ax2.set_xlabel("y")
+    ax2.set_ylabel("f(x₀, y) and ∂f/∂y")
+    ax2.set_title("Rate of Change w.r.t y")
+    ax2.legend()
+    ax2.grid(True)
+
+    st.pyplot(fig2)
+else:
+    st.info("ℹ️ No y-direction graph (function does not depend on y).")
 
 # =================================================
 # 3. Differentials
